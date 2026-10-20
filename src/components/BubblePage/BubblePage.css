@@ -1,0 +1,2050 @@
+/* =========================
+   PÁGINA 3 — BUBBLE MENU
+========================= */
+
+.bubble-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  overflow: hidden;
+
+  /*
+    Verde salvia de la maqueta.
+  */
+  background: #c4ccbc;
+
+  color: #4a171b;
+
+  isolation: isolate;
+}
+
+
+/* =========================
+   PEQUEÑO TÍTULO EDITORIAL
+========================= */
+
+.bubble-page-heading {
+  position: absolute;
+
+  top: 138px;
+  left: 4vw;
+
+  z-index: 10;
+
+  color: #4a171b;
+
+  pointer-events: none;
+}
+
+.bubble-page-heading span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.74rem;
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  color: #4a171b;
+
+  opacity: 1;
+}
+
+.bubble-page-heading h2 {
+  margin: 0;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    2.5rem,
+    3.5vw,
+    4.5rem
+  );
+
+  font-weight: 700;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.055em;
+
+  color: #4a171b;
+}
+
+/* =========================
+   LOGO DEL BUBBLE MENU
+========================= */
+
+.bubble-sol-logo {
+  font-family: var(--font-sans);
+
+  font-size: 1rem;
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+
+  color: #321316;
+}
+
+
+/* =========================
+   BUBBLE MENU DENTRO
+   DE ESTA PÁGINA
+========================= */
+
+.bubble-page .bubble-menu {
+  display: none;
+}
+
+.bubble-page .bubble-menu-items {
+  padding-top: 70px;
+}
+
+
+/* Hacemos las pills un poco
+   más suaves/editoriales */
+
+.bubble-page .pill-link {
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.18),
+    0 3px 12px rgba(0, 0, 0, 0.08);
+
+  font-family: var(--font-sans);
+
+  letter-spacing: -0.04em;
+}
+
+/* =========================
+   TAMAÑO BUBBLES
+========================= */
+
+/* =========================
+   LAYOUT INICIAL BUBBLES
+   3 ARRIBA + 2 ABAJO
+========================= */
+
+/* =========================
+   BUBBLES — 3 ARRIBA / 2 ABAJO
+========================= */
+
+.bubble-page .bubble-menu-items .pill-list {
+  /*
+    ESTE ES EL TAMAÑO DE CADA BUBBLE.
+
+    Cambiando estos tres valores
+    cambiás todas juntas.
+  */
+  --bubble-width: clamp(220px, 20vw, 330px);
+
+  --bubble-gap: clamp(10px, 1vw, 18px);
+
+  width: 100%;
+
+  padding: 0 24px;
+
+  display: grid;
+
+  /*
+    Cada bubble ocupa 2 columnas.
+    Calculamos las columnas a partir
+    del ancho final que queremos.
+  */
+  grid-template-columns:
+    repeat(
+      6,
+      calc(
+        (var(--bubble-width) - var(--bubble-gap)) / 2
+      )
+    );
+
+  justify-content: center;
+
+  column-gap: var(--bubble-gap);
+
+  row-gap: clamp(
+    12px,
+    1.2vw,
+    20px
+  );
+
+  margin: 0 auto;
+}
+
+/* Todas exactamente del mismo tamaño */
+
+.bubble-page .bubble-menu-items .pill-col {
+  grid-column: span 2;
+
+  width: 100%;
+
+  padding: 0;
+
+  margin-left: 0 !important;
+}
+
+
+/* EDUCATION — segunda fila */
+
+.bubble-page .bubble-menu-items .pill-col:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+
+/* CONTACT — segunda fila */
+
+.bubble-page .bubble-menu-items .pill-col:nth-child(5) {
+  grid-column: 4 / span 2;
+}
+
+
+/* =========================
+   TAMAÑO ADAPTATIVO
+========================= */
+
+.bubble-page .pill-link {
+  width: 100%;
+
+  /*
+    Al cambiar el ancho,
+    también cambia automáticamente
+    la altura.
+  */
+  aspect-ratio: 2.65 / 1;
+
+  height: auto;
+  min-height: 0;
+
+  padding: 0 1rem;
+
+  font-size: clamp(
+    1.4rem,
+    1.8vw,
+    2rem
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 899px) {
+
+  .bubble-page-heading {
+    top: 100px;
+    left: 24px;
+  }
+
+  .bubble-page .bubble-menu-items {
+    padding-top: 180px;
+  }
+
+  .bubble-page .bubble-menu-items .pill-list {
+    grid-template-columns: 1fr;
+
+    width: min(520px, 88vw);
+
+    row-gap: 12px;
+  }
+
+  .bubble-page .bubble-menu-items .pill-col,
+  .bubble-page .bubble-menu-items .pill-col:nth-child(4),
+  .bubble-page .bubble-menu-items .pill-col:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .bubble-page .pill-link {
+    --pill-min-h: 76px;
+
+    height: 76px;
+    min-height: 76px;
+
+    font-size: 1.35rem;
+  }
+}
+
+/* ==================================
+   ABOUT — LEFT CONTENT
+================================== */
+
+.about-content {
+  position: absolute;
+
+  top: 138px;
+  left: 4vw;
+
+  z-index: 120;
+
+  width: min(720px, 48vw);
+
+  color: #4a171b;
+
+  pointer-events: none;
+}
+
+
+/* 03 — ABOUT */
+
+.about-eyebrow {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.74rem;
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  color: #4a171b;
+}
+
+
+/* ABOUT ME */
+
+.about-title {
+  margin: 0 0 28px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    3.1rem,
+    4.3vw,
+    5rem
+  );
+
+  font-weight: 700;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.055em;
+
+  color: #4a171b;
+
+  transform-origin: left center;
+}
+
+
+/* TEXTO */
+
+.about-copy {
+  width: min(650px, 100%);
+}
+
+
+.about-copy p {
+  margin:
+    0
+    0
+    20px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.95rem,
+    1.05vw,
+    1.12rem
+  );
+
+  font-weight: 400;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.018em;
+
+  color: #4a171b;
+}
+
+
+.about-copy strong {
+  font-weight: 700;
+}
+
+
+/* ==================================
+   BOTÓN CV
+================================== */
+
+.about-cv-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+
+  margin-top: 2px;
+
+  padding:
+    11px
+    15px;
+
+  border:
+    2px solid
+    #4a171b;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #4a171b;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.78rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.about-cv-button:hover {
+  background: #4a171b;
+
+  color: #f3eee8;
+
+  transform:
+    translateY(-2px);
+}
+
+
+.about-cv-arrow {
+  font-size: 1.05rem;
+
+  transition:
+    transform 0.25s ease;
+}
+
+
+.about-cv-button:hover
+.about-cv-arrow {
+  transform:
+    translateX(4px);
+}
+
+/* ==================================
+   EDUCATION — PANELS
+================================== */
+
+.education-panels {
+  position: absolute;
+
+  top: 220px;
+  left: 4vw;
+  right: 4vw;
+
+  z-index: 120;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: clamp(
+    20px,
+    2.5vw,
+    42px
+  );
+
+  /*
+    Altura adaptable.
+
+    En pantallas bajas se achican.
+    En pantallas grandes recuperan
+    el tamaño de la maqueta completa.
+  */
+  height: clamp(
+    235px,
+    42vh,
+    395px
+  );
+
+  pointer-events: none;
+}
+
+
+/* ==================================
+   CARD
+================================== */
+
+.education-card {
+  position: relative;
+  isolation: isolate;
+
+  min-width: 0;
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: #f3eee8;
+
+  color: #321316;
+
+  box-shadow:
+    0 18px 45px rgba(50, 19, 22, 0.05);
+
+  pointer-events: auto;
+}
+
+.education-card::after {
+  content: '';
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 56px;
+
+  pointer-events: none;
+  z-index: 3;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(243, 238, 232, 0) 0%,
+      rgba(243, 238, 232, 0.45) 48%,
+      rgba(243, 238, 232, 0.88) 82%,
+      rgba(243, 238, 232, 1) 100%
+    );
+}
+
+
+/* ==================================
+   SCROLL INTERNO
+================================== */
+
+.education-card-scroll {
+  height: 100%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding:
+    32px
+    34px
+    78px;
+
+  box-sizing: border-box;
+
+  overscroll-behavior: contain;
+
+  scrollbar-gutter: stable;
+
+  touch-action: pan-y;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(74, 23, 27, 0.36)
+    transparent;
+}
+
+
+/* Chrome / Safari */
+
+.education-card-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.education-card-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.education-card-scroll::-webkit-scrollbar-thumb {
+  background:
+    rgba(74, 23, 27, 0.32);
+
+  border-radius: 999px;
+}
+
+.education-card-scroll::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(74, 23, 27, 0.58);
+}
+
+
+/* ==================================
+   EDUCATION ENTRY
+================================== */
+
+.education-entry {
+  margin-bottom: 27px;
+}
+
+.education-entry:last-child {
+  margin-bottom: 0;
+}
+
+
+/* CURRENTLY PURSUING / GRADUATED */
+
+.education-entry-heading {
+  width: 100%;
+
+  padding-bottom: 5px;
+
+  margin-bottom: 14px;
+
+  border-bottom:
+    1px solid
+    rgba(50, 19, 22, 0.45);
+
+  font-family: var(--font-sans);
+
+  font-size: 0.74rem;
+  font-weight: 800;
+
+  line-height: 1;
+
+  letter-spacing: -0.01em;
+
+  color: #4a171b;
+}
+
+
+/* TÍTULOS */
+
+.education-entry h3,
+.language-entry h3 {
+  margin:
+    0
+    0
+    5px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.92rem,
+    1vw,
+    1.08rem
+  );
+
+  font-weight: 700;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.025em;
+
+  color: #191817;
+}
+
+
+/* UNIVERSIDAD */
+
+.education-institution {
+  margin:
+    0
+    0
+    11px;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.78rem;
+  font-weight: 500;
+
+  line-height: 1.25;
+
+  color: #191817;
+}
+
+
+/* ==================================
+   TAGS
+================================== */
+
+.education-tags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.education-tags span {
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 25px;
+
+  padding:
+    5px
+    12px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(50, 19, 22, 0.09);
+
+  font-family: var(--font-sans);
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  line-height: 1;
+
+  color: #191817;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================
+   LANGUAGES
+================================== */
+
+.language-entry {
+  padding:
+    0
+    0
+    22px;
+
+  margin-bottom: 18px;
+
+  border-bottom:
+    1px solid
+    rgba(50, 19, 22, 0.35);
+}
+
+.language-entry:last-child {
+  margin-bottom: 0;
+
+  border-bottom: 0;
+}
+
+.language-entry p {
+  margin:
+    0
+    0
+    4px;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  line-height: 1.25;
+
+  color: #191817;
+}
+
+.language-entry strong {
+  display: block;
+
+  margin-bottom: 9px;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.76rem;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  color: #191817;
+}
+
+
+/* ==================================
+   CERTIFICATE BUTTON
+================================== */
+
+.education-certificate {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 26px;
+
+  padding:
+    5px
+    12px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(50, 19, 22, 0.09);
+
+  color: #191817;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  line-height: 1;
+
+  text-decoration: none;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.education-certificate:hover {
+  background: #4a171b;
+
+  color: #f3eee8;
+
+  transform:
+    translateY(-1px);
+}
+
+/* ==================================
+   EXPERIENCE — MAIN LAYOUT
+================================== */
+
+.experience-layout {
+  position: absolute;
+
+  top: 165px;
+  left: 4vw;
+  right: 4vw;
+  bottom: 150px;
+
+  z-index: 120;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(520px, 1.35fr);
+
+  gap: clamp(
+    45px,
+    7vw,
+    120px
+  );
+
+  pointer-events: none;
+}
+
+
+/* ==================================
+   LEFT VISUAL SLOT
+   Después ponemos acá el componente
+   de imágenes.
+================================== */
+
+.experience-media-slot {
+  position: relative;
+
+  min-width: 0;
+
+  height: clamp(
+    360px,
+    48vh,
+    470px
+  );
+
+  margin-top: 75px;
+
+  pointer-events: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.experience-carousel-transition {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+}
+
+/* ==================================
+   RIGHT COLUMN WRAPPER
+================================== */
+
+.experience-list-shell {
+  position: relative;
+
+  width: 100%;
+  height: calc(100% - 25px);
+
+  min-width: 0;
+  min-height: 0;
+
+  margin-top: 40px;
+
+  pointer-events: auto;
+}
+
+
+/* ==================================
+   EXPERIENCE — INTERNAL SCROLL
+================================== */
+
+.experience-list-scroll {
+  width: 100%;
+  height: 100%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding:
+    0
+    8px
+    62px
+    0;
+
+  box-sizing: border-box;
+
+  pointer-events: auto;
+
+  overscroll-behavior: contain;
+
+  touch-action: pan-y;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    rgba(74, 23, 27, 0.32)
+    transparent;
+}
+
+
+/* Chrome / Safari */
+
+.experience-list-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.experience-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.experience-list-scroll::-webkit-scrollbar-thumb {
+  background:
+    rgba(74, 23, 27, 0.28);
+
+  border-radius: 999px;
+}
+
+.experience-list-scroll::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(74, 23, 27, 0.52);
+}
+
+/* ==================================
+   EXPERIENCE CARD
+================================== */
+
+.experience-card {
+  position: relative;
+
+  width: 100%;
+
+  margin-bottom: 14px;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+  background: #f3eee8;
+  color: #4a171b;
+
+  border: 1px solid rgba(74, 23, 27, 0.05);
+
+  box-shadow:
+    0 18px 42px rgba(50, 19, 22, 0.08),
+    0 3px 10px rgba(50, 19, 22, 0.05);
+
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.experience-card.is-open
+.experience-card-panel::after {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 52px;
+
+  z-index: 5;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(243, 238, 232, 0) 0%,
+      rgba(243, 238, 232, 0.18) 32%,
+      rgba(243, 238, 232, 0.58) 65%,
+      rgba(243, 238, 232, 0.92) 88%,
+      rgba(243, 238, 232, 1) 100%
+    );
+}
+
+/* ==================================
+   CARD HEADER
+================================== */
+
+.experience-card-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 26px;
+
+  padding:
+    23px
+    30px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: inherit;
+
+  text-align: left;
+
+  font-family: var(--font-sans);
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+
+/* ==================================
+   HEADING CONTENT
+================================== */
+
+.experience-card-heading {
+  min-width: 0;
+}
+
+.experience-card-heading h3 {
+  margin:
+    0
+    0
+    4px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    1.35rem,
+    1.65vw,
+    2rem
+  );
+
+  font-weight: 750;
+
+  line-height: 1;
+
+  letter-spacing: -0.04em;
+
+  color: #4a171b;
+}
+
+
+.experience-role {
+  margin:
+    0
+    0
+    5px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.86rem,
+    1vw,
+    1.08rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.015em;
+
+  color: #4a171b;
+}
+
+
+.experience-meta {
+  margin: 0;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.76rem,
+    0.88vw,
+    0.96rem
+  );
+
+  font-weight: 500;
+
+  font-style: italic;
+
+  line-height: 1.2;
+
+  color: #4a171b;
+}
+
+
+/* ==================================
+   CHEVRON
+================================== */
+
+.experience-chevron {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  font-family: var(--font-sans);
+
+  font-size: 2rem;
+  font-weight: 500;
+
+  line-height: 1;
+
+  color: #4a171b;
+
+  transform-origin: center;
+}
+
+
+/* ==================================
+   PANEL
+================================== */
+
+.experience-card-panel {
+  position: relative;
+
+  overflow: hidden;
+}
+
+
+/* ==================================
+   BODY
+================================== */
+
+.experience-card-body {
+  position: relative;
+
+  max-height: none;
+
+  overflow: visible;
+
+  padding:
+    0
+    30px
+    42px;
+
+  box-sizing: border-box;
+
+  font-family: var(--font-sans);
+
+  color: #4a171b;
+}
+
+
+/* ==================================
+   INTRO / LEAD
+================================== */
+
+.experience-lead {
+  position: relative;
+
+  margin:
+    2px
+    0
+    25px;
+
+  padding:
+    0
+    0
+    0
+    24px;
+
+  max-width: 880px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.9rem,
+    1vw,
+    1.08rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.22;
+
+  letter-spacing: -0.018em;
+
+  color: #927b79;
+}
+
+.experience-lead::before {
+  content: '';
+
+  position: absolute;
+
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+
+  width: 2px;
+
+  border-radius: 999px;
+
+  background: #702a32;
+}
+
+
+/* ==================================
+   TAGS
+================================== */
+
+.experience-tags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  margin-bottom: 30px;
+}
+
+.experience-tags span {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 26px;
+
+  padding:
+    5px
+    12px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(50, 19, 22, 0.09);
+
+  font-family: var(--font-sans);
+
+  font-size: 0.69rem;
+  font-weight: 750;
+
+  line-height: 1;
+
+  color: #191817;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================
+   DETAIL SECTIONS
+================================== */
+
+.experience-detail-section {
+  margin-bottom: 27px;
+}
+
+.experience-detail-section h4,
+.experience-related-work h4,
+.experience-achievement h4 {
+  margin:
+    0
+    0
+    9px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.88rem,
+    1vw,
+    1.02rem
+  );
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  letter-spacing: -0.02em;
+
+  color: #4a171b;
+}
+
+
+.experience-detail-section p,
+.experience-achievement p {
+  margin:
+    0
+    0
+    15px;
+
+  max-width: 900px;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(
+    0.88rem,
+    0.98vw,
+    1.04rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.22;
+
+  letter-spacing: -0.015em;
+
+  color: #4a171b;
+}
+
+
+/* ==================================
+   LINKS / BUTTONS
+================================== */
+
+.experience-action-link {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  width: fit-content;
+
+  min-height: 34px;
+
+  margin:
+    2px
+    0
+    0;
+
+  padding:
+    6px
+    14px;
+
+  border:
+    2px solid
+    #4a171b;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #4a171b;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.76rem;
+  font-weight: 650;
+
+  line-height: 1;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.experience-action-link:hover {
+  background: #4a171b;
+
+  color: #f3eee8;
+
+  transform:
+    translateY(-2px);
+}
+
+.experience-action-link span:last-child {
+  font-size: 1rem;
+
+  transition:
+    transform 0.22s ease;
+}
+
+.experience-action-link:hover
+span:last-child {
+  transform:
+    translateX(3px);
+}
+
+
+/* ==================================
+   GET A GAME HIGHLIGHT
+================================== */
+
+.experience-highlight {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  margin:
+    2px
+    0
+    16px;
+}
+
+.experience-highlight strong {
+  font-family: var(--font-sans);
+
+  font-size: 1rem;
+  font-weight: 750;
+
+  color: #4a171b;
+}
+
+.experience-highlight span {
+  font-family: var(--font-sans);
+
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  color: #4a171b;
+}
+
+
+/* ==================================
+   T15 ACHIEVEMENT
+================================== */
+
+.experience-achievement {
+  margin:
+    6px
+    0
+    29px;
+
+  padding:
+    16px
+    18px;
+
+  border-radius: 9px;
+
+  background:
+    rgba(112, 42, 50, 0.065);
+}
+
+.experience-achievement p {
+  margin-bottom: 0;
+}
+
+
+/* ==================================
+   RELATED WORK
+================================== */
+
+.experience-related-work {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+
+.experience-related-item {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 5px;
+}
+
+
+.experience-related-item p {
+  margin: 0;
+
+  font-family: var(--font-sans);
+
+  font-size: 0.71rem;
+  font-weight: 650;
+
+  line-height: 1.2;
+
+  color: #4a171b;
+}
+
+/* ==================================
+   EXPERIENCE — TABLET / MOBILE
+================================== */
+
+@media (max-width: 1050px) {
+
+  .experience-layout {
+    grid-template-columns:
+      minmax(0, 0.7fr)
+      minmax(440px, 1.3fr);
+
+    gap: 32px;
+  }
+
+}
+
+
+@media (max-width: 899px) {
+
+  .experience-layout {
+    top: 185px;
+    left: 24px;
+    right: 24px;
+    bottom: 110px;
+
+    display: block;
+  }
+
+  .experience-media-slot {
+    display: none;
+  }
+
+  .experience-card-header {
+    padding:
+      20px
+      22px;
+  }
+
+  .experience-card-body {
+    padding:
+      0
+      22px
+      28px;
+  }
+
+  .experience-card-heading h3 {
+    font-size: 1.35rem;
+  }
+
+}
+
+/* ==================================
+   EXPERIENCE — DEPTH CAROUSEL
+================================== */
+
+.experience-media-slot
+.depth-carousel {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Flechas */
+
+.experience-media-slot
+.depth-carousel__arrow {
+  width: 40px;
+  height: 40px;
+
+  border:
+    1px solid
+    rgba(74, 23, 27, 0.18);
+
+  background:
+    rgba(243, 238, 232, 0.82);
+
+  color: #4a171b;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 8px 24px
+    rgba(50, 19, 22, 0.08);
+}
+
+
+.experience-media-slot
+.depth-carousel__arrow:hover {
+  background: #4a171b;
+
+  border-color: #4a171b;
+
+  color: #f3eee8;
+}
+
+
+/* Indicadores */
+
+.experience-media-slot
+.depth-carousel__dots {
+  bottom: 5px;
+
+  background:
+    rgba(243, 238, 232, 0.75);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+
+.experience-media-slot
+.depth-carousel__dot {
+  background:
+    rgba(74, 23, 27, 0.24);
+}
+
+
+.experience-media-slot
+.depth-carousel__dot.is-active {
+  background: #4a171b;
+}
+
+
+/* Focus */
+
+.experience-media-slot
+.depth-carousel:focus-visible {
+  outline:
+    2px solid
+    rgba(74, 23, 27, 0.35);
+
+  outline-offset: 4px;
+}
+
+/* ==================================
+   SKILLS
+================================== */
+
+.skills-layout {
+  position: absolute;
+
+  top: 245px;
+  left: 4vw;
+  right: 4vw;
+  bottom: 145px;
+
+  z-index: 120;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.12fr)
+    minmax(420px, 0.78fr);
+
+  gap: clamp(
+    45px,
+    6vw,
+    95px
+  );
+
+  align-items: start;
+
+  pointer-events: none;
+}
+
+
+/* ==================================
+   LEFT
+================================== */
+
+.skills-accordion {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  pointer-events: auto;
+}
+
+
+.skills-card {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #f3eee8;
+
+  border:
+    1px solid
+    rgba(74, 23, 27, 0.05);
+
+  box-shadow:
+    0 10px 28px
+    rgba(50, 19, 22, 0.05);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.skills-card:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 14px 34px
+    rgba(50, 19, 22, 0.08);
+}
+
+
+.skills-card.is-active {
+  box-shadow:
+    0 16px 38px
+    rgba(50, 19, 22, 0.08);
+}
+
+
+/* HEADER */
+
+.skills-card-header {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding:
+    18px
+    22px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #4a171b;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+
+.skills-card-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  font-family:
+    var(--font-sans);
+
+  font-size:
+    clamp(
+      0.88rem,
+      1vw,
+      1.04rem
+    );
+
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  text-transform: uppercase;
+
+  letter-spacing: -0.025em;
+}
+
+
+.skills-card-title strong {
+  font-weight: 800;
+}
+
+
+.skills-card-arrow {
+  flex-shrink: 0;
+
+  font-size: 1rem;
+
+  line-height: 1;
+
+  color: #4a171b;
+}
+
+
+/* CONTENT */
+
+.skills-card-content {
+  overflow: hidden;
+}
+
+
+.skills-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  column-gap: 28px;
+  row-gap: 8px;
+
+  padding:
+    0
+    22px
+    20px;
+}
+
+
+.skills-item {
+  font-family:
+    var(--font-sans);
+
+  font-size:
+    clamp(
+      0.78rem,
+      0.88vw,
+      0.95rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1.15;
+
+  color: #4a171b;
+}
+
+
+.skills-item::before {
+  content: '·';
+
+  margin-right: 6px;
+
+  opacity: 0.45;
+}
+
+
+/* ==================================
+   AI NOTE
+================================== */
+
+.skills-ai-note {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 8px;
+
+  margin-top: 4px;
+
+  padding:
+    6px
+    4px;
+
+  font-family:
+    var(--font-sans);
+
+  color: #4a171b;
+}
+
+
+.skills-ai-note strong {
+  flex-shrink: 0;
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+}
+
+
+.skills-ai-note span {
+  max-width: 620px;
+
+  font-size: 0.7rem;
+
+  line-height: 1.25;
+
+  opacity: 0.72;
+}
+
+
+/* ==================================
+   RIGHT VISUAL
+================================== */
+
+.skills-visual {
+  position: relative;
+
+  width: 100%;
+  height:
+    clamp(
+      330px,
+      43vh,
+      440px
+    );
+
+  pointer-events: auto;
+}
+
+
+.skills-visual-inner {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: #f3eee8;
+
+  box-shadow:
+    0 18px 45px
+    rgba(50, 19, 22, 0.08);
+}
+
+
+.skills-visual-image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* caption inferior */
+
+.skills-visual-caption {
+  position: absolute;
+
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding:
+    10px
+    13px;
+
+  border-radius: 8px;
+
+  background:
+    rgba(243, 238, 232, 0.86);
+
+  backdrop-filter:
+    blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
+
+  color: #4a171b;
+
+  font-family:
+    var(--font-sans);
+
+  font-size: 0.68rem;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+
+/* ==================================
+   RESPONSIVE
+================================== */
+
+@media (max-width: 1100px) {
+
+  .skills-layout {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(330px, 0.72fr);
+
+    gap: 30px;
+  }
+
+}
+
+
+@media (max-width: 820px) {
+
+  .skills-layout {
+    position: absolute;
+
+    top: 220px;
+
+    grid-template-columns: 1fr;
+
+    overflow-y: auto;
+  }
+
+
+  .skills-visual {
+    height: 320px;
+  }
+
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .skills-ai-note {
+    flex-direction: column;
+  }
+
+}

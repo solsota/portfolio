@@ -1,0 +1,194 @@
+.archive-folders {
+  position: absolute;
+
+  left: 10px;
+  bottom: -115px;
+
+  z-index: 4;
+
+  width: clamp(430px, 53vw, 650px);
+  height: 260px;
+
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  font: inherit;
+  cursor: pointer;
+
+  perspective: 1000px;
+  isolation: isolate;
+}
+
+
+/* =========================
+   CARPETA BASE
+   ========================= */
+
+.archive-folder {
+  position: absolute;
+  left: 0;
+
+  height: 155px;
+
+  border-radius: 0 24px 18px 18px;
+
+  box-shadow:
+    0 -5px 18px rgba(50, 19, 22, 0.04),
+    0 8px 18px rgba(50, 19, 22, 0.08);
+
+  transform-origin: center bottom;
+
+  transition:
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+
+/* Pestaña superior */
+
+.archive-folder::before {
+  content: '';
+
+  position: absolute;
+
+  top: -38px;
+  left: var(--tab-left, 0);
+
+  width: var(--tab-width, 185px);
+  height: 46px;
+
+  background: inherit;
+
+  border-radius: 18px 18px 0 0;
+}
+
+
+/* Texto de la pestaña */
+
+.folder-label {
+  position: absolute;
+
+  top: -27px;
+  left: calc(var(--tab-left, 0px) + 20px);
+
+  z-index: 2;
+
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  letter-spacing: 0.1em;
+
+  color: rgba(50, 19, 22, 0.7);
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   CADA CARPETA
+   ========================= */
+
+.folder-uiux {
+  width: 76%;
+  left: 0;
+  bottom: 118px;
+
+  z-index: 1;
+
+  background: #b98f98;
+
+  --tab-left: 0px;
+  --tab-width: 170px;
+}
+
+.folder-games {
+  width: 84%;
+  left: 32px;
+  bottom: 79px;
+
+  z-index: 2;
+
+  background: #8fa6b7;
+
+  --tab-left: 58%;
+  --tab-width: 175px;
+}
+
+.folder-visual {
+  width: 90%;
+  left: 16px;
+  bottom: 40px;
+
+  z-index: 3;
+
+  background: #aa8981;
+
+  --tab-left: 12%;
+  --tab-width: 180px;
+}
+
+.folder-creative {
+  width: 96%;
+  left: 24px;
+  bottom: 0;
+
+  z-index: 4;
+
+  background: #c3a39c;
+
+  --tab-left: 0px;
+  --tab-width: 195px;
+}
+
+
+/* =========================
+   HOVER
+   ========================= */
+
+.archive-folders:hover .folder-uiux,
+.archive-folders:focus-visible .folder-uiux {
+  transform:
+    translate(-18px, -12px)
+    rotate(-1.2deg);
+}
+
+
+.archive-folders:hover .folder-games,
+.archive-folders:focus-visible .folder-games {
+  transform:
+    translate(22px, -8px)
+    rotate(0.8deg);
+}
+
+
+.archive-folders:hover .folder-visual,
+.archive-folders:focus-visible .folder-visual {
+  transform:
+    translate(-9px, -5px)
+    rotate(-0.5deg);
+}
+
+
+.archive-folders:hover .folder-creative,
+.archive-folders:focus-visible .folder-creative {
+  transform:
+    translate(18px, -9px)
+    rotate(0.7deg);
+
+  box-shadow:
+    0 -8px 22px rgba(50, 19, 22, 0.05),
+    0 14px 28px rgba(50, 19, 22, 0.11);
+}
+
+
+/* Pequeña reacción al presionar */
+
+.archive-folders:active .folder-creative {
+  transform:
+    translate(18px, -15px)
+    scale(0.995);
+}

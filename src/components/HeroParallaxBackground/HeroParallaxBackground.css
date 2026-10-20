@@ -1,0 +1,397 @@
+/* =========================
+   CONTENEDOR DEL RECORRIDO
+   ========================= */
+
+.parallax-background {
+  position: relative;
+
+  width: 100%;
+  height: 260vh;
+
+  z-index: 0;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   ESCENA STICKY
+   ========================= */
+.parallax-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Perspectiva general */
+
+.parallax-camera {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  perspective: 1800px;
+
+  overflow: visible;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   PLANO DE LAS 3 FILAS
+   ========================= */
+
+.parallax-stage {
+  position: absolute;
+
+  top: 20%;
+  left: -12%;
+
+  width: 124%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 28px;
+
+  transform-origin: center top;
+  transform-style: preserve-3d;
+
+  will-change: transform;
+
+  pointer-events: none;
+}
+
+/* =========================
+   SUAVIDAD SOLO EN EL HERO
+   ========================= */
+
+.parallax-stage {
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+/* Solo cuando estamos al principio del Home */
+
+.parallax-background.intro-soft .parallax-stage {
+  opacity: 0.32;
+}
+
+/* Seguridad absoluta:
+   en la galería SIEMPRE 100% */
+
+.parallax-background.marquee-active .parallax-stage {
+  opacity: 1 !important;
+}
+
+/* =========================
+   FILAS
+   ========================= */
+
+.flow-row {
+  position: relative;
+
+  width: 100%;
+
+  overflow: visible;
+
+  pointer-events: auto;
+}
+
+.flow-row-viewport {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  padding: 7px 0;
+  margin: -12px 0;
+
+  pointer-events: auto;
+}
+
+/* =========================
+   CATEGORÍAS DE PROYECTOS
+========================= */
+
+.flow-row-label {
+  position: relative;
+
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  width: 260px;
+
+  /*
+    Compensa el -12% de
+    .parallax-stage y termina
+    visualmente cerca de 4vw.
+  */
+  margin-left: 10%;
+
+  margin-bottom: 12px;
+
+  font-family: var(--font-sans);
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  letter-spacing: 0.02em;
+
+  color: #321316;
+
+  opacity: 0;
+
+  transform: translateY(6px);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+
+  pointer-events: none;
+}
+
+.flow-row-label-line {
+  flex: 1;
+
+  height: 1px;
+
+  background:
+    rgba(50, 19, 22, 0.55);
+}
+
+
+/*
+  Solo aparecen cuando llegamos
+  a la galería frontal.
+*/
+
+.parallax-background.marquee-active
+.flow-row-label {
+  opacity: 1;
+
+  transform:
+    translateY(0);
+}
+
+
+/*
+  Todas las filas tienen la MISMA orientación.
+  Las diferencias de posición vienen de Motion,
+  no de distintas rotaciones.
+*/
+
+.flow-row-one,
+.flow-row-two,
+.flow-row-three {
+  transform-origin: center center;
+}
+
+
+/* =========================
+   TRACK MARQUEE
+   ========================= */
+
+.flow-track {
+  display: flex;
+
+  width: max-content;
+
+  gap: 28px;
+
+  will-change: transform;
+
+  user-select: none;
+  
+    -webkit-user-drag: none;
+
+  touch-action: pan-y;
+}
+
+
+/* Dos copias idénticas */
+
+.flow-set {
+  display: flex;
+
+  gap: 28px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================
+   CARDS
+   ========================= */
+
+.flow-card {
+  position: relative;
+
+  display: block;
+
+  width: clamp(250px, 24vw, 390px);
+
+  aspect-ratio: 16 / 10;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 30px rgba(50, 19, 22, 0.10),
+    0 2px 10px rgba(0, 0, 0, 0.06);
+
+  transition:
+    filter 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+
+  pointer-events: auto;
+}
+
+
+.flow-card img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* Hover individual */
+
+.flow-card:hover {
+  animation-play-state: paused;
+
+  filter: brightness(1.05);
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 18px 38px rgba(50, 19, 22, 0.14),
+    0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 900px) {
+
+  .parallax-stage {
+    left: -25%;
+    width: 150%;
+    gap: 22px;
+  }
+
+  .flow-track,
+  .flow-set {
+    gap: 20px;
+  }
+
+  .flow-card {
+    width: clamp(220px, 42vw, 330px);
+  }
+
+  .parallax-background.marquee-active .flow-track {
+  cursor: grab;
+}
+
+.parallax-background.marquee-active .flow-track:active {
+  cursor: grabbing;
+}
+
+}
+
+
+/* =========================
+   CELULAR
+   ========================= */
+
+@media (max-width: 560px) {
+
+  .parallax-stage {
+    top: 12%;
+    left: -45%;
+    width: 190%;
+    gap: 18px;
+  }
+
+  .flow-card {
+    width: 66vw;
+  }
+
+}
+
+/* =========================
+   VIDA SUTIL EN EL HERO
+   ========================= */
+
+.parallax-background:not(.marquee-active)
+.flow-set .flow-card:nth-child(2) {
+  animation: subtleFloatOne 7s ease-in-out infinite;
+}
+
+.parallax-background:not(.marquee-active)
+.flow-set .flow-card:nth-child(4) {
+  animation: subtleFloatTwo 9s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.parallax-background:not(.marquee-active)
+.flow-row-two .flow-card:nth-child(3) {
+  animation: subtleFloatThree 8s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+
+@keyframes subtleFloatOne {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+
+@keyframes subtleFloatTwo {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(20px);
+  }
+}
+
+
+@keyframes subtleFloatThree {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(-0.4deg);
+  }
+}
