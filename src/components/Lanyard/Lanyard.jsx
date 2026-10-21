@@ -1,7 +1,6 @@
-/* eslint-disable react/no-unknown-property */
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, events, extend, useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
 import {
   BallCollider,
@@ -9,12 +8,13 @@ import {
   Physics,
   RigidBody,
   useRopeJoint,
-  useSphericalJoint
+  useSphericalJoint,
+  useBeforePhysicsStep
 } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
 import cardGLB from './card.glb';
-import lanyard from './lanyard.png';
+import lanyard from './lanyard.webp';
 
 import * as THREE from 'three';
 import './Lanyard.css';
@@ -22,12 +22,38 @@ import './Lanyard.css';
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 const BLANK_PIXEL =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+  'data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
 
 const FRONT_UV_RECT = { x: 0, y: 0, w: 0.5, h: 0.755 };
 const BACK_UV_RECT = { x: 0.5, y: 0, w: 0.5, h: 0.757 };
+const CARD_ATTACHMENT = [0, 1.51, 0];
+
+function createLanyardEvents(state) {
+  let overNavigation = false;
+  return {
+    ...events(state),
+    compute(event, currentState) {
+      // The canvas listens on the entire page; visible menus own their input.
+      overNavigation = Boolean(event.target?.closest?.('.navigation'));
+      if (overNavigation) return;
+      // Events arrive through the page so the transparent canvas doesn't
+      // block navigation. Measure the canvas to keep raycasting aligned.
+      const bounds = currentState.gl.domElement.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      currentState.pointer.set(
+        ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
+        -((event.clientY - bounds.top) / bounds.height) * 2 + 1
+      );
+      currentState.raycaster.setFromCamera(currentState.pointer, currentState.camera);
+    },
+    filter(intersections) {
+      return overNavigation ? [] : intersections;
+    }
+  };
+}
 
 export default function Lanyard({
+  eventSource,
   position = [0, 0, 30],
   offset = [0, 0, 0],
   gravity = [0, -40, 0],
@@ -39,20 +65,43 @@ export default function Lanyard({
   lanyardImage = null,
   lanyardWidth = 1
 }) {
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.innerWidth < 768
+  const wrapperRef = useRef(null);
+  const [visible, setVisible] = useState(true);
+  const [pageVisible, setPageVisible] = useState(!document.hidden);
+  const [{ width: viewportWidth, height: viewportHeight }, setViewport] = useState(
+    () => ({ width: window.innerWidth, height: window.innerHeight })
   );
+  const isMobile = viewportWidth < 768;
+  const stacked = viewportWidth <= 700;
+  // Keep the original full-width scene; fit the card to the available width
+  // instead of letting tall viewports magnify it over the hero copy.
+  const fittedFov = THREE.MathUtils.radToDeg(2 * Math.atan(viewportHeight / (2 * position[2] * viewportWidth * 0.143)));
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { rootMargin: '80px' });
+    observer.observe(wrapperRef.current);
+    const onVisibility = () => setPageVisible(!document.hidden);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+
   return (
-    <div className="lanyard-wrapper">
+    <div className="lanyard-wrapper" ref={wrapperRef}>
       <Canvas
-        camera={{ position, fov }}
+        frameloop={visible && pageVisible ? 'always' : 'never'}
+        resize={{ scroll: false }}
+        eventSource={eventSource}
+        events={createLanyardEvents}
+        camera={{ position, fov: stacked ? 20 : Math.max(fov, fittedFov) }}
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{ alpha: transparent }}
         onCreated={({ gl }) =>
@@ -64,9 +113,14 @@ export default function Lanyard({
       >
         <ambientLight intensity={Math.PI} />
 
+        <Suspense fallback={null}>
         <Physics
           gravity={gravity}
-          timeStep={isMobile ? 1 / 30 : 1 / 60}
+          timeStep={1 / 60}
+          interpolate
+          numSolverIterations={8}
+          updatePriority={-2}
+          paused={!visible || !pageVisible}
         >
           <Band
             isMobile={isMobile}
@@ -75,7 +129,7 @@ export default function Lanyard({
             imageFit={imageFit}
             lanyardImage={lanyardImage}
             lanyardWidth={lanyardWidth}
-            offset={offset}
+            offset={stacked ? [0.65, 0.5, 0] : offset}
           />
         </Physics>
 
@@ -109,6 +163,7 @@ export default function Lanyard({
             scale={[100, 10, 1]}
           />
         </Environment>
+        </Suspense>
       </Canvas>
     </div>
   );
@@ -131,11 +186,14 @@ function Band({
   const j2 = useRef();
   const j3 = useRef();
   const card = useRef();
+  const cardAttachmentRef = useRef();
+  const jointVisuals = useRef([]);
+  const gestureRef = useRef(null);
 
   const vec = new THREE.Vector3();
   const ang = new THREE.Vector3();
   const rot = new THREE.Vector3();
-  const dir = new THREE.Vector3();
+  const dragPlaneRef = useRef(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0));
 
   const segmentProps = {
     type: 'dynamic',
@@ -223,18 +281,66 @@ function Band({
     materials.base.map
   ]);
 
-  const [curve] = useState(
-    () =>
-      new THREE.CatmullRomCurve3([
+  const [curve] = useState(() => {
+      const curve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(),
         new THREE.Vector3(),
         new THREE.Vector3(),
         new THREE.Vector3()
-      ])
-  );
+      ]);
+      curve.curveType = 'chordal';
+      return curve;
+  });
 
   const [dragged, drag] = useState(false);
   const [hovered, hover] = useState(false);
+
+  const finishDrag = useCallback(() => {
+    const gesture = gestureRef.current;
+    gestureRef.current = null;
+    if (gesture?.target.hasPointerCapture(gesture.id)) gesture.target.releasePointerCapture(gesture.id);
+    drag(false);
+    hover(false);
+  }, []);
+
+  useEffect(() => {
+    // A touch scroll may end with pointercancel instead of pointerup. R3F
+    // doesn't forward that event to meshes, so release at the native source.
+    const move = event => {
+      const gesture = gestureRef.current;
+      if (!gesture || gesture.id !== event.pointerId || gesture.type !== 'touch' || gesture.dragging) return;
+      const dx = Math.abs(event.clientX - gesture.x);
+      const dy = Math.abs(event.clientY - gesture.y);
+      if (Math.max(dx, dy) < 10) return;
+      if (dy >= dx) return finishDrag();
+      gesture.dragging = true;
+      gesture.target.setPointerCapture(gesture.id);
+      drag(gesture.offset);
+    };
+    const end = event => {
+      if (gestureRef.current?.id === event.pointerId) finishDrag();
+    };
+    const onVisibility = () => { if (document.hidden) finishDrag(); };
+    window.addEventListener('pointermove', move, true);
+    window.addEventListener('pointerup', end, true);
+    window.addEventListener('pointercancel', end, true);
+    window.addEventListener('lostpointercapture', end, true);
+    window.addEventListener('blur', finishDrag);
+    window.addEventListener('scroll', finishDrag, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('pointermove', move, true);
+      window.removeEventListener('pointerup', end, true);
+      window.removeEventListener('pointercancel', end, true);
+      window.removeEventListener('lostpointercapture', end, true);
+      window.removeEventListener('blur', finishDrag);
+      window.removeEventListener('scroll', finishDrag);
+      document.removeEventListener('visibilitychange', onVisibility);
+      const gesture = gestureRef.current;
+      gestureRef.current = null;
+      if (gesture?.target.hasPointerCapture(gesture.id)) gesture.target.releasePointerCapture(gesture.id);
+    };
+  }, [finishDrag]);
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
@@ -242,7 +348,7 @@ function Band({
 
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-     [0, 1.51, 0]
+    CARD_ATTACHMENT
   ]);
 
   useEffect(() => {
@@ -255,38 +361,48 @@ function Band({
     };
   }, [hovered, dragged]);
 
-  useFrame((state, delta) => {
+  useBeforePhysicsStep(() => {
+    if (!card.current || card.current.isSleeping() || dragged) return;
+    ang.copy(card.current.angvel());
+    rot.copy(card.current.rotation());
+    // Apply this once per physics step, not once per rendered frame.
+    card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z }, false);
+  });
+
+  // Apply drag input before Rapier advances the bodies for this frame.
+  useFrame((state) => {
     if (dragged) {
-      vec
-        .set(state.pointer.x, state.pointer.y, 0.5)
-        .unproject(state.camera);
-
-      dir
-        .copy(vec)
-        .sub(state.camera.position)
-        .normalize();
-
-      vec.add(
-        dir.multiplyScalar(state.camera.position.length())
-      );
+      state.raycaster.setFromCamera(state.pointer, state.camera);
+      state.raycaster.ray.intersectPlane(dragPlaneRef.current, vec);
 
       [card, j1, j2, j3, fixed].forEach((ref) =>
         ref.current?.wakeUp()
       );
 
+      vec.sub(dragged);
+      // Keep the card within the rope's reach instead of stretching the joints.
+      const anchor = fixed.current.translation();
+      const reach = 4.5;
+      const distance = vec.distanceTo(anchor);
+      if (distance > reach) vec.sub(anchor).multiplyScalar(reach / distance).add(anchor);
       card.current?.setNextKinematicTranslation({
-        x: vec.x - dragged.x,
-        y: vec.y - dragged.y,
-        z: vec.z - dragged.z
+        x: vec.x,
+        y: vec.y,
+        z: vec.z
       });
     }
+  }, -3);
 
-    if (fixed.current) {
-      [j1, j2].forEach((ref) => {
+  // Read interpolated transforms after Rapier, then draw before R3F renders.
+  // Explicit priorities keep this order identical in development and production.
+  useFrame((_, delta) => {
+    if (fixed.current && band.current && cardAttachmentRef.current) {
+      [j1, j2].forEach((ref, index) => {
+        // Use the same interpolated positions as the rendered card; reading
+        // raw 30/60 Hz body positions makes the band jump between physics ticks.
+        jointVisuals.current[index]?.getWorldPosition(vec);
         if (!ref.current.lerped) {
-          ref.current.lerped = new THREE.Vector3().copy(
-            ref.current.translation()
-          );
+          ref.current.lerped = new THREE.Vector3().copy(vec);
         }
 
         const clampedDistance = Math.max(
@@ -294,20 +410,19 @@ function Band({
           Math.min(
             1,
             ref.current.lerped.distanceTo(
-              ref.current.translation()
+              vec
             )
           )
         );
 
         ref.current.lerped.lerp(
-          ref.current.translation(),
-          delta *
-            (minSpeed +
-              clampedDistance * (maxSpeed - minSpeed))
+          vec,
+          1 - Math.exp(-Math.min(delta, 0.05) *
+            (minSpeed + clampedDistance * (maxSpeed - minSpeed)))
         );
       });
 
-      curve.points[0].copy(j3.current.translation());
+      cardAttachmentRef.current.getWorldPosition(curve.points[0]);
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
@@ -316,20 +431,8 @@ function Band({
         curve.getPoints(isMobile ? 16 : 32)
       );
 
-      ang.copy(card.current.angvel());
-      rot.copy(card.current.rotation());
-
-      card.current.setAngvel({
-        x: ang.x,
-        y: ang.y - rot.y * 0.25,
-        z: ang.z
-      });
     }
-  });
-
-  curve.curveType = 'chordal';
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
+  }, -1);
 
  const [offsetX, offsetY, offsetZ] = offset;
 
@@ -343,54 +446,55 @@ return (
     />
 
     <RigidBody
-      position={[0.5 + offsetX, 4 + offsetY, offsetZ]}
+      position={[offsetX, 3 + offsetY, offsetZ]}
       ref={j1}
       {...segmentProps}
     >
-      <BallCollider args={[0.1]} />
+      <BallCollider args={[0.1]} collisionGroups={0} />
+      <group ref={element => { jointVisuals.current[0] = element; }} />
     </RigidBody>
 
     <RigidBody
-      position={[1 + offsetX, 4 + offsetY, offsetZ]}
+      position={[offsetX, 2 + offsetY, offsetZ]}
       ref={j2}
       {...segmentProps}
     >
-      <BallCollider args={[0.1]} />
+      <BallCollider args={[0.1]} collisionGroups={0} />
+      <group ref={element => { jointVisuals.current[1] = element; }} />
     </RigidBody>
 
     <RigidBody
-      position={[1.5 + offsetX, 4 + offsetY, offsetZ]}
+      position={[offsetX, 1 + offsetY, offsetZ]}
       ref={j3}
       {...segmentProps}
     >
-      <BallCollider args={[0.1]} />
+      <BallCollider args={[0.1]} collisionGroups={0} />
     </RigidBody>
 
     <RigidBody
-      position={[2 + offsetX, 4 + offsetY, offsetZ]}
+      position={[offsetX, -0.51 + offsetY, offsetZ]}
       ref={card}
       {...segmentProps}
       type={dragged ? 'kinematicPosition' : 'dynamic'}
     >
-      <CuboidCollider args={[0.8, 1.125, 0.01]} />
+      <CuboidCollider args={[0.8, 1.125, 0.01]} collisionGroups={0} />
+      <group ref={cardAttachmentRef} position={CARD_ATTACHMENT} />
 
       <group
         scale={[2.05, 2.25, 2.25]}
         position={[0, -1.2, -0.05]}
-        onPointerOver={() => hover(true)}
+        onPointerOver={event => { if (event.pointerType === 'mouse') hover(true); }}
         onPointerOut={() => hover(false)}
-        onPointerUp={(event) => {
-          event.target.releasePointerCapture(event.pointerId);
-          drag(false);
-        }}
         onPointerDown={(event) => {
-          event.target.setPointerCapture(event.pointerId);
-
-          drag(
-            new THREE.Vector3()
-              .copy(event.point)
-              .sub(vec.copy(card.current.translation()))
-          );
+          if (event.button > 0 || gestureRef.current || !card.current) return;
+          const offset = new THREE.Vector3().copy(event.point).sub(card.current.translation());
+          dragPlaneRef.current.constant = -event.point.z;
+          gestureRef.current = { id: event.pointerId, type: event.pointerType, target: event.target,
+            x: event.clientX, y: event.clientY, offset, dragging: event.pointerType !== 'touch' };
+          if (event.pointerType !== 'touch') {
+            event.target.setPointerCapture(event.pointerId);
+            drag(offset);
+          }
         }}
       >
         <mesh geometry={nodes.card.geometry}>
@@ -428,6 +532,8 @@ return (
         }
         useMap
         map={texture}
+        map-wrapS={THREE.RepeatWrapping}
+        map-wrapT={THREE.RepeatWrapping}
         repeat={[-4, 1]}
         lineWidth={lanyardWidth}
       />

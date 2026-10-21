@@ -15,17 +15,17 @@
 
   overflow: hidden;
 
-  background: #eee9e3;
+  background: var(--toolbar-surface);
 
-  color: #4a171b;
+  color: var(--section-text);
 
   border-bottom:
     1px solid
-    rgba(74, 23, 27, 0.08);
+    rgba(var(--section-text-rgb), 0.08);
 
   box-shadow:
     0 5px 18px
-    rgba(74, 23, 27, 0.04);
+    rgba(var(--section-text-rgb), 0.04);
 }
 
 /* ==================================
@@ -66,8 +66,8 @@
   background:
     linear-gradient(
       to right,
-      #ebe7e2,
-      rgba(235, 231, 226, 0)
+      rgb(var(--toolbar-fade-rgb)),
+      rgba(var(--toolbar-fade-rgb), 0)
     );
 }
 
@@ -78,8 +78,8 @@
   background:
     linear-gradient(
       to left,
-      #ebe7e2,
-      rgba(235, 231, 226, 0)
+      rgb(var(--toolbar-fade-rgb)),
+      rgba(var(--toolbar-fade-rgb), 0)
     );
 }
 
@@ -132,9 +132,9 @@
 
   border-radius: 999px;
 
-  background: #f8f5f0;
+  background: var(--popover-surface);
 
-  color: #321316;
+  color: var(--deep-burgundy);
 
   font-family:
     var(--font-sans);
@@ -149,7 +149,7 @@
 
   box-shadow:
     0 3px 12px
-    rgba(50, 19, 22, 0.07);
+    rgba(var(--shadow-rgb), 0.07);
 
   user-select: none;
 }
@@ -209,14 +209,12 @@
 
   from {
     transform:
-      translateX(0);
+      translate3d(0, 0, 0);
   }
 
   to {
     transform:
-      translateX(
-        calc(-50% - 7px)
-      );
+      translate3d(-50%, 0, 0);
   }
 
 }

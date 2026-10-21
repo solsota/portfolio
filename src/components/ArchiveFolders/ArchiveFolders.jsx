@@ -1,26 +1,29 @@
+import { useLanguage } from '../../i18n/LanguageContext'
 import './ArchiveFolders.css'
 
 function ArchiveFolders() {
+  const { t } = useLanguage()
+
   return (
     <button
       className="archive-folders"
       type="button"
-      aria-label="Open creative archive"
+      aria-label={t("Open creative archive")}
     >
       <span className="archive-folder folder-uiux">
-        <span className="folder-label">UI / UX</span>
+        <span className="folder-label">{t("UI / UX")}</span>
       </span>
 
       <span className="archive-folder folder-games">
-        <span className="folder-label">GAMES</span>
+        <span className="folder-label">{t("GAMES")}</span>
       </span>
 
       <span className="archive-folder folder-visual">
-        <span className="folder-label">VISUAL</span>
+        <span className="folder-label">{t("VISUAL")}</span>
       </span>
 
       <span className="archive-folder folder-creative">
-        <span className="folder-label">CREATIVE</span>
+        <span className="folder-label">{t("CREATIVE")}</span>
       </span>
     </button>
   )

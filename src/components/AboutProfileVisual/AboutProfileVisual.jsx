@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useLanguage } from '../../i18n/LanguageContext'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 
-import layer1 from '../../assets/about-profile/layer-1.png'
-import layer2 from '../../assets/about-profile/layer-2.png'
-import layer3 from '../../assets/about-profile/layer-3.png'
+import layer1 from '../../assets/about-profile/layer-1.webp'
+import layer2 from '../../assets/about-profile/layer-2.webp'
+import layer3 from '../../assets/about-profile/layer-3.webp'
 
 import './AboutProfileVisual.css'
 
 
-const profileLines = [
+const originalProfileLines = [
   'Sol Masetti',
   'UX UI - Game Designer',
   'Creative thinker & maker',
@@ -22,6 +23,8 @@ const profileLines = [
 export default function AboutProfileVisual({
   active = false
 }) {
+  const { t } = useLanguage()
+  const profileLines = useMemo(() => originalProfileLines.map((line) => t(line)), [t])
 
   const [typedLines, setTypedLines] =
     useState(
@@ -37,11 +40,11 @@ export default function AboutProfileVisual({
 
     if (!active) {
 
-      setTypedLines(
-        profileLines.map(() => '')
-      )
+      const resetId = setTimeout(() => {
+        setTypedLines(profileLines.map(() => ''))
+      }, 0)
 
-      return
+      return () => clearTimeout(resetId)
     }
 
 
@@ -133,7 +136,7 @@ export default function AboutProfileVisual({
       )
     }
 
-  }, [active])
+  }, [active, profileLines])
 
 
   return (
@@ -253,7 +256,7 @@ export default function AboutProfileVisual({
 
           <img
             src={layer3}
-            alt="Profile archive visual"
+            alt={t("Profile archive visual")}
             className="about-profile-layer"
           />
 
@@ -264,9 +267,7 @@ export default function AboutProfileVisual({
 
           <div className="about-profile-typewriter">
 
-            <h3 className="about-profile-heading">
-              MY PROFILE
-            </h3>
+            <h3 className="about-profile-heading">{t("MY PROFILE")}</h3>
 
 
             <div className="about-profile-lines">

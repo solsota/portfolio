@@ -1,0 +1,54 @@
+.resume-section {
+  --resume-surface: #eadcda;
+  --resume-text: #4a171b;
+  --resume-muted: #74565a;
+  --resume-action: #702a32;
+  --resume-on-action: #f3eee8;
+  --resume-action-hover: #4a171b;
+  position: relative;
+  padding: 0;
+  background: var(--resume-surface);
+  color: var(--resume-text);
+  scroll-margin-top: 110px;
+  overflow-anchor: none;
+}
+
+.resume-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 350px);
+  align-items: center;
+  gap: 40px;
+  padding: clamp(32px, 4vw, 56px) 4vw;
+}
+
+.resume-copy, .resume-download { min-width: 0; }
+.resume-eyebrow { margin: 0 0 14px; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.resume-copy h2 { margin: 0; font-size: clamp(2.3rem, 4.8vw, 4.5rem); font-weight: 600; line-height: 1.12; letter-spacing: -.055em; overflow-wrap: anywhere; }
+.resume-description { margin: 18px 0 0; max-width: 440px; color: var(--resume-muted); font-size: clamp(.9rem, 1.1vw, 1rem); line-height: 1.65; }
+.resume-file { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; font-size: .85rem; font-weight: 500; }
+.resume-file > svg { flex: 0 0 auto; }
+.resume-format { display: block; margin-top: 2px; font-size: .65rem; letter-spacing: .08em; }
+.resume-language { margin-left: auto; padding: 6px 12px; border: 1px solid currentColor; border-radius: 999px; font-size: .7rem; }
+.resume-button { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 54px; padding: 15px 23px; border: 0; border-radius: 999px; background: var(--resume-action); color: var(--resume-on-action); font-size: .9rem; font-weight: 500; cursor: pointer; transition: background 180ms ease, color 180ms ease; }
+.resume-button:not(:disabled):hover { background: var(--resume-action-hover); }
+.resume-button:focus-visible { outline: 2px solid var(--resume-text); outline-offset: 5px; }
+.resume-button:disabled { opacity: .62; cursor: default; }
+.resume-button svg { flex: 0 0 auto; }
+.resume-status { min-height: 1.5em; margin: 10px 0 0; color: var(--resume-muted); text-align: center; font-size: .7rem; line-height: 1.5; }
+
+:root[data-theme='dark'] .resume-section {
+  --resume-surface: #4b1b30;
+  --resume-text: #f3eee8;
+  --resume-muted: #d0b9c2;
+  --resume-action: #f3eee8;
+  --resume-on-action: #3b0c21;
+  --resume-action-hover: #eadcda;
+}
+
+@media (max-width: 700px) {
+  .resume-card { grid-template-columns: minmax(0, 1fr); gap: 30px; padding: 36px 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-button { transition: none; }
+}

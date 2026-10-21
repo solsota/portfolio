@@ -1,0 +1,16 @@
+.contact-content { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 14px; min-width: 0; pointer-events: auto; }
+.contact-card { display: flex; align-items: center; gap: 18px; min-width: 0; min-height: 85px; padding: 22px 26px; border-radius: 16px; background: var(--button-surface); color: var(--button-text); box-shadow: 0 8px 24px rgba(var(--shadow-rgb), .07); font-weight: 600; transition: background .18s, color .18s, transform .18s; }
+a.contact-card:hover { background: var(--button-hover-surface, var(--accent-solid)); color: var(--button-hover-text, var(--on-accent)); transform: translateY(-2px); }
+.contact-card:focus-visible { outline: 2px solid var(--burgundy); outline-offset: 3px; }
+.contact-email { grid-column: 1 / -1; }
+.contact-card-text { flex: 1; min-width: 0; }
+.contact-label { display: block; margin-bottom: 4px; font-size: .75rem; font-weight: 500; }
+.contact-address { font-size: clamp(1rem, 2vw, 1.8rem); overflow-wrap: anywhere; }
+.contact-icon, .contact-arrow { flex-shrink: 0; }
+@media (max-width: 560px) {
+  .contact-content { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .contact-card { min-height: 68px; padding: 18px; gap: 12px; font-size: .95rem; }
+  .contact-email { gap: 10px; }
+  .contact-email .contact-arrow { width: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .contact-card { transition: none; } }

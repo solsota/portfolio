@@ -1,7 +1,15 @@
-import React, {
+import { useLanguage } from '../../i18n/LanguageContext'
+import { projectArchiveRows } from '../../data/projectArchiveRows'
+import mediaSizes from '../../data/projectMediaSizes.json'
+import {
+  useCallback,
+  memo,
+  useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
-  useState
+  useState,
+  useSyncExternalStore
 } from 'react'
 
 import {
@@ -14,6 +22,14 @@ import {
 } from 'motion/react'
 
 import './HeroParallaxBackground.css'
+
+const mobileGalleryQuery = '(max-width: 700px)'
+function subscribeMobileGallery(onChange) {
+  const query = window.matchMedia(mobileGalleryQuery)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+const isMobileGallery = () => window.matchMedia(mobileGalleryQuery).matches
 
 function wrapTrackX(value, width) {
   if (!width) return value
@@ -31,21 +47,25 @@ function wrapTrackX(value, width) {
   return next
 }
 
-function ProjectCard({
+const ProjectCard = memo(function ProjectCard({
   product,
   duplicate = false,
+  interactive = false,
   shouldBlockClick
 }) {
+  const { href } = useLanguage()
   return (
     <a
-      href={product.link}
+      href={href(product.link)}
       className="flow-card"
+      aria-label={duplicate ? undefined : product.title}
       draggable={false}
-      aria-hidden={duplicate ? 'true' : undefined}
-      tabIndex={duplicate ? -1 : undefined}
+      aria-hidden={duplicate || !interactive ? 'true' : undefined}
+      tabIndex={duplicate || !interactive ? -1 : undefined}
+      style={{ '--card-image-scale': product.imageScale, '--card-image-position': product.imagePosition }}
       onClick={(event) => {
         if (
-          product.link === '#' ||
+          !interactive ||
           shouldBlockClick?.()
         ) {
           event.preventDefault()
@@ -56,12 +76,16 @@ function ProjectCard({
         src={product.thumbnail}
         alt={duplicate ? '' : product.title}
         draggable={false}
+        decoding="async"
+        {...mediaSizes[product.thumbnail]}
       />
+      {product.eva && <img className="flow-card-eva" src="/ultimoturno/Icon EVa.webp" width="381" height="229" alt="" aria-hidden="true" />}
+      <span className="flow-card-caption" aria-hidden="true" lang="en"><span className="flow-card-title">{product.icon && <img className={`flow-card-tool${product.lightIcon ? ' flow-card-tool--light' : ''}`} src={product.icon} width="24" height="24" alt="" />}{product.title}</span><span>↗</span></span>
     </a>
   )
-}
+})
 
-function FlowRow({
+const FlowRow = memo(function FlowRow({
   items,
   direction,
   x,
@@ -69,22 +93,33 @@ function FlowRow({
   marqueeActive,
   label,
   speed = 18,
+  scrollPauseUntilRef,
 }) {
+  const { t } = useLanguage()
+  const [copiesPerSet, setCopiesPerSet] = useState(1)
+  const renderedItems = useMemo(() => Array.from({ length: items.length * copiesPerSet }, (_, index) => ({
+    ...items[index % items.length], repeated: index >= items.length,
+  })), [items, copiesPerSet])
+
   const trackRef = useRef(null)
+  const viewportRef = useRef(null)
   const firstSetRef = useRef(null)
 
   const cycleWidthRef = useRef(0)
   const initializedRef = useRef(false)
 
   const isHoveredRef = useRef(false)
+  const isFocusedRef = useRef(false)
   const isDraggingRef = useRef(false)
 
   const pointerIdRef = useRef(null)
   const lastPointerXRef = useRef(0)
+  const pointerStartRef = useRef(null)
   const totalDragRef = useRef(0)
 
   const resumeAtRef = useRef(0)
   const draggedEnoughRef = useRef(false)
+  const shouldBlockClick = useCallback(() => draggedEnoughRef.current, [])
 
   const trackX = useMotionValue(0)
 
@@ -112,6 +147,15 @@ function FlowRow({
         firstSetRef.current.offsetWidth +
         gap
 
+      // Repeat only enough cards to cover this viewport, including large desktops.
+      const baseCycleWidth = cycleWidth / copiesPerSet
+      if (!baseCycleWidth) return
+      const requiredCopies = Math.max(1, Math.ceil(viewportRef.current.clientWidth / baseCycleWidth))
+      if (requiredCopies !== copiesPerSet) {
+        setCopiesPerSet(requiredCopies)
+        return
+      }
+
       cycleWidthRef.current = cycleWidth
 
       /*
@@ -134,19 +178,54 @@ function FlowRow({
 
     measure()
 
-    window.addEventListener(
-      'resize',
-      measure
-    )
+    const observer = new ResizeObserver(measure)
+    observer.observe(viewportRef.current)
+    observer.observe(firstSetRef.current)
 
     return () => {
-      window.removeEventListener(
-        'resize',
-        measure
-      )
+      observer.disconnect()
     }
+  }, [trackX, copiesPerSet])
+
+  const moveTrack = useCallback((movement) => {
+    const cycleWidth = cycleWidthRef.current
+    if (!cycleWidth || !Number.isFinite(movement) || movement === 0) return
+
+    trackX.set(wrapTrackX(trackX.get() + movement, cycleWidth))
+    resumeAtRef.current = performance.now() + 1200
   }, [trackX])
 
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport || !marqueeActive) return
+
+    const handleWheel = (event) => {
+      if (event.ctrlKey || event.defaultPrevented || isDraggingRef.current) return
+
+      const horizontal = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      // Vertical trackpad gestures belong to the page, including slight X drift.
+      if (!horizontal && !event.shiftKey) return
+      const delta = horizontal ? event.deltaX : event.deltaY
+      if (!delta) return
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientWidth : 1
+
+      // Only horizontal gestures (or Shift + wheel) control this row.
+      if (event.cancelable) event.preventDefault()
+      moveTrack(-delta * unit)
+    }
+
+    viewport.addEventListener('wheel', handleWheel, { passive: false })
+    return () => viewport.removeEventListener('wheel', handleWheel)
+  }, [marqueeActive, moveTrack])
+
+  const handleKeyDown = (event) => {
+    if (!marqueeActive || event.ctrlKey || event.altKey || event.metaKey) return
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+
+    event.preventDefault()
+    const step = Math.min(viewportRef.current.clientWidth * 0.6, 600)
+    moveTrack(event.key === 'ArrowLeft' ? step : -step)
+  }
 
   /* =========================
      MARQUEE AUTOMÁTICO
@@ -158,7 +237,10 @@ function FlowRow({
 
     if (!cycleWidth) return
     if (!marqueeActive) return
+    if (document.hidden) return
+    if (performance.now() < scrollPauseUntilRef.current) return
     if (isHoveredRef.current) return
+    if (isFocusedRef.current) return
     if (isDraggingRef.current) return
 
     if (
@@ -175,7 +257,7 @@ function FlowRow({
 
     const movement =
       speed *
-      (delta / 1000) *
+      (Math.min(delta, 50) / 1000) *
       directionMultiplier
 
     trackX.set(
@@ -201,7 +283,8 @@ function FlowRow({
       return
     }
 
-    isDraggingRef.current = true
+    isDraggingRef.current = false
+    pointerStartRef.current = { x: event.clientX, y: event.clientY }
 
     pointerIdRef.current =
       event.pointerId
@@ -212,20 +295,30 @@ function FlowRow({
     totalDragRef.current = 0
     draggedEnoughRef.current = false
 
-    event.currentTarget.setPointerCapture(
-      event.pointerId
-    )
   }
 
 
   const handlePointerMove = (event) => {
-    if (!isDraggingRef.current) return
-
     if (
       event.pointerId !==
       pointerIdRef.current
     ) {
       return
+    }
+
+    if (!isDraggingRef.current) {
+      const start = pointerStartRef.current
+      if (!start) return
+      const dx = Math.abs(event.clientX - start.x)
+      const dy = Math.abs(event.clientY - start.y)
+      if (Math.max(dx, dy) < 10) return
+      if (dy >= dx) {
+        pointerIdRef.current = null
+        pointerStartRef.current = null
+        return
+      }
+      isDraggingRef.current = true
+      event.currentTarget.setPointerCapture(event.pointerId)
     }
 
     const deltaX =
@@ -271,7 +364,7 @@ function FlowRow({
 
 
   const finishPointerDrag = (event) => {
-    if (!isDraggingRef.current) return
+    if (event.pointerId !== pointerIdRef.current) return
 
     isDraggingRef.current = false
 
@@ -286,6 +379,7 @@ function FlowRow({
     }
 
     pointerIdRef.current = null
+    pointerStartRef.current = null
 
 
     /*
@@ -315,26 +409,44 @@ function FlowRow({
       className={`flow-row ${className}`}
       style={{ x }}
 
-      onMouseEnter={() => {
-        isHoveredRef.current = true
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') isHoveredRef.current = true
       }}
 
-      onMouseLeave={() => {
+      onPointerLeave={() => {
         isHoveredRef.current = false
 
         if (!isDraggingRef.current) {
-          resumeAtRef.current =
+          resumeAtRef.current = Math.max(
+            resumeAtRef.current,
             performance.now() + 350
+          )
         }
       }}
     >
     <div className="flow-row-label">
-      <span>{label}</span>
+      <span lang="en">{label}</span>
 
       <span className="flow-row-label-line" />
     </div>
 
-    <div className="flow-row-viewport">
+    <div
+      ref={viewportRef}
+      className="flow-row-viewport"
+      role="region"
+      aria-label={t(label)}
+      tabIndex={marqueeActive ? 0 : -1}
+      onKeyDown={handleKeyDown}
+      onFocusCapture={() => {
+        isFocusedRef.current = true
+      }}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          isFocusedRef.current = false
+          resumeAtRef.current = Math.max(resumeAtRef.current, performance.now() + 350)
+        }
+      }}
+    >
       <motion.div
         ref={trackRef}
         className={`flow-track flow-track-${direction}`}
@@ -352,14 +464,13 @@ function FlowRow({
           className="flow-set"
           aria-hidden="true"
         >
-          {items.map((product) => (
+          {renderedItems.map((product, index) => (
             <ProjectCard
-              key={`before-${product.title}`}
+              key={`before-${index}`}
               product={product}
               duplicate
-              shouldBlockClick={() =>
-                draggedEnoughRef.current
-              }
+              interactive={marqueeActive}
+              shouldBlockClick={shouldBlockClick}
             />
           ))}
         </div>
@@ -371,13 +482,13 @@ function FlowRow({
           ref={firstSetRef}
           className="flow-set"
         >
-          {items.map((product) => (
+          {renderedItems.map((product, index) => (
             <ProjectCard
-              key={product.title}
+              key={`original-${index}`}
               product={product}
-              shouldBlockClick={() =>
-                draggedEnoughRef.current
-              }
+              duplicate={product.repeated}
+              interactive={marqueeActive}
+              shouldBlockClick={shouldBlockClick}
             />
           ))}
         </div>
@@ -389,14 +500,13 @@ function FlowRow({
           className="flow-set"
           aria-hidden="true"
         >
-          {items.map((product) => (
+          {renderedItems.map((product, index) => (
             <ProjectCard
-              key={`after-${product.title}`}
+              key={`after-${index}`}
               product={product}
               duplicate
-              shouldBlockClick={() =>
-                draggedEnoughRef.current
-              }
+              interactive={marqueeActive}
+              shouldBlockClick={shouldBlockClick}
             />
           ))}
         </div>
@@ -407,13 +517,25 @@ function FlowRow({
 
     </motion.div>
   )
-}
+})
 
 
-function HeroParallaxBackground({ products }) {
+function HeroParallaxBackground() {
+
+  const mobileGallery = useSyncExternalStore(subscribeMobileGallery, isMobileGallery)
+
   const containerRef = useRef(null)
+  const scrollPauseUntilRef = useRef(0)
+  const transitionStateRef = useRef({ active: false, soft: true })
   const [marqueeActive, setMarqueeActive] = useState(false)
   const [introSoft, setIntroSoft] = useState(true)
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting))
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -443,13 +565,13 @@ function HeroParallaxBackground({ products }) {
   const scale = useTransform(
     scrollYProgress,
     [0, 0.6],
-    [1.08, 0.94]
+    [1.08, mobileGallery ? 1 : 0.94]
   )
 
   const stageY = useTransform(
     scrollYProgress,
     [0, 0.6],
-    [0, -120]
+    ['0svh', '-12svh']
   )
 
 
@@ -489,22 +611,25 @@ function HeroParallaxBackground({ products }) {
   scrollYProgress,
   'change',
   (latest) => {
-    setMarqueeActive(latest >= 0.62)
+    if (mobileGallery) scrollPauseUntilRef.current = performance.now() + 160
+    const active = latest >= 0.62
+    const soft = latest < 0.16
+    if (active !== transitionStateRef.current.active) setMarqueeActive(active)
 
     // Solo suavizamos las cards al comienzo del HOME.
-    setIntroSoft(latest < 0.16)
+    if (soft !== transitionStateRef.current.soft) setIntroSoft(soft)
+    transitionStateRef.current = { active, soft }
   }
 )
 
 
-  const rowOne = products.slice(0, 5)
-  const rowTwo = products.slice(5, 10)
-  const rowThree = products.slice(10, 15)
+  const rowOffsets = [rowOneX, rowTwoX, rowThreeX]
 
 
   return (
     <div
   ref={containerRef}
+  data-offscreen={!visible || undefined}
   className={`parallax-background
     ${marqueeActive ? 'marquee-active' : ''}
     ${introSoft ? 'intro-soft' : ''}
@@ -524,35 +649,12 @@ function HeroParallaxBackground({ products }) {
             }}
           >
 
-            <FlowRow
-            items={rowOne}
-            direction="right"
-            x={rowOneX}
-             className="flow-row-one"
-             marqueeActive={marqueeActive}
-             label="DIGITAL / UX·UI"
-            speed={19}
-            />
-
-            <FlowRow
-            items={rowTwo}
-            direction="left"
-            x={rowTwoX}
-            className="flow-row-two"
-            marqueeActive={marqueeActive}
-            label="GAME EXPERIENCES"
-            speed={17}
-            />
-
-            <FlowRow
-            items={rowThree}
-            direction="right"
-            x={rowThreeX}
-             className="flow-row-three"
-            marqueeActive={marqueeActive}
-            label="3D & PRODUCT DESIGN"
-            speed={20}
-            />
+            {projectArchiveRows.map((row, index) => <FlowRow key={row.id}
+              items={row.cards} direction={index === 1 ? 'left' : 'right'}
+              x={rowOffsets[index]} className={`flow-row-${['one', 'two', 'three'][index]}`}
+              marqueeActive={marqueeActive && visible} label={row.label} speed={[19, 17, 20][index]}
+              scrollPauseUntilRef={scrollPauseUntilRef}
+            />)}
 
           </motion.div>
 

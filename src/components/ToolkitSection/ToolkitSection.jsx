@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext'
 import './ToolkitSection.css'
 
 
@@ -17,6 +18,8 @@ const tools = [
 
 
 function ToolkitSection() {
+  const { t } = useLanguage()
+
 
   const duplicatedTools = [
     ...tools,
@@ -27,7 +30,7 @@ function ToolkitSection() {
   return (
     <section
       className="toolkit-section"
-      aria-label="Toolkit"
+      aria-label={t("Toolkit")}
     >
 
       <div className="toolkit-marquee">

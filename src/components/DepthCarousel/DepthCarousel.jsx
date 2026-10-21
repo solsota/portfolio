@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLanguage } from '../../i18n/LanguageContext'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import './DepthCarousel.css';
 
 const DEFAULT_ITEMS = [
-  { image: 'https://picsum.photos/seed/depth1/800/1000', alt: 'Slide 1' },
-  { image: 'https://picsum.photos/seed/depth2/800/1000', alt: 'Slide 2' },
-  { image: 'https://picsum.photos/seed/depth3/800/1000', alt: 'Slide 3' },
-  { image: 'https://picsum.photos/seed/depth4/800/1000', alt: 'Slide 4' },
-  { image: 'https://picsum.photos/seed/depth5/800/1000', alt: 'Slide 5' },
-  { image: 'https://picsum.photos/seed/depth6/800/1000', alt: 'Slide 6' }
+  { image: '/experience/adimensional-01.webp', alt: 'Slide 1' },
+  { image: '/experience/adimensional-02.webp', alt: 'Slide 2' },
+  { image: '/experience/adimensional-03.webp', alt: 'Slide 3' },
+  { image: '/experience/t15-01.webp', alt: 'Slide 4' },
+  { image: '/experience/t15-02.webp', alt: 'Slide 5' },
+  { image: '/experience/t15-03.webp', alt: 'Slide 6' }
 ];
 
 const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
@@ -38,6 +39,8 @@ const DepthCarousel = ({
   onChange,
   className = ''
 }) => {
+  const { t } = useLanguage()
+
   const data = useMemo(() => (Array.isArray(items) ? items : []).map(normalizeItem), [items]);
   const count = data.length;
 
@@ -60,8 +63,9 @@ const DepthCarousel = ({
 
   const [active, setActive] = useState(0);
 
-  onChangeRef.current = onChange;
-  cfgRef.current = {
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange;
+    cfgRef.current = {
     count,
     depth,
     spread,
@@ -74,8 +78,10 @@ const DepthCarousel = ({
     ease,
     loop,
     cardWidth,
+    cardHeight,
     autoplayDelay
-  };
+    };
+  });
 
   const layout = useCallback(pos => {
     const cfg = cfgRef.current;
@@ -178,10 +184,10 @@ const DepthCarousel = ({
     const root = rootRef.current;
     if (!root) return;
     const ro = new ResizeObserver(entries => {
-      const w = entries[0].contentRect.width;
+      const { width, height } = entries[0].contentRect;
       const cfg = cfgRef.current;
       const needed = cfg.cardWidth + Math.abs(cfg.spread) * 2 + 120;
-      scaleRef.current = clamp(w / needed, 0.4, 1);
+      scaleRef.current = clamp(Math.min(width / needed, height / cfg.cardHeight), 0, 1);
       layout(posRef.current);
     });
     ro.observe(root);
@@ -194,6 +200,7 @@ const DepthCarousel = ({
     const onWheel = e => {
       const cfg = cfgRef.current;
       if (cfg.count < 2) return;
+      if (e.ctrlKey) return;
       e.preventDefault();
       tweenRef.current?.kill();
       const raw = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -213,10 +220,12 @@ const DepthCarousel = ({
 
   const onPointerDown = useCallback(e => {
     const cfg = cfgRef.current;
-    if (cfg.count < 2) return;
+    if (cfg.count < 2 || e.button > 0 || e.target.closest('button')) return;
     tweenRef.current?.kill();
     dragRef.current = {
       x: e.clientX,
+      y: e.clientY,
+      touch: e.pointerType === 'touch',
       startPos: posRef.current,
       lastX: e.clientX,
       lastT: performance.now(),
@@ -233,7 +242,13 @@ const DepthCarousel = ({
       const cfg = cfgRef.current;
       const stepPx = Math.max(cfg.cardWidth * 0.55 * scaleRef.current, 40);
       const dx = e.clientX - drag.x;
-      if (!drag.moved && Math.abs(dx) > 4) {
+      const dy = e.clientY - drag.y;
+      const slop = drag.touch ? 10 : 4;
+      if (!drag.moved && drag.touch && Math.abs(dy) > slop && Math.abs(dy) >= Math.abs(dx)) {
+        dragRef.current = null;
+        return;
+      }
+      if (!drag.moved && Math.abs(dx) > slop) {
         drag.moved = true;
         rootRef.current?.setPointerCapture(drag.id);
       }
@@ -345,13 +360,17 @@ const DepthCarousel = ({
       className={`depth-carousel ${className}`.trim()}
       style={{ '--dc-perspective': `${perspective}px` }}
       role="group"
-      aria-roledescription="carousel"
-      aria-label="Depth carousel"
+      aria-roledescription={t("carousel")}
+      aria-label={t("Depth carousel")}
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerEnd}
-      onPointerCancel={onPointerEnd}
+      onPointerCancel={() => {
+        if (!dragRef.current) return;
+        dragRef.current = null;
+        setFocus(focusRef.current, true);
+      }}
       onKeyDown={onKeyDown}
     >
       <div className="depth-carousel__stage" ref={stageRef}>
@@ -361,12 +380,12 @@ const DepthCarousel = ({
             className="depth-carousel__card"
             ref={el => (cardRefs.current[i] = el)}
             style={{ width: cardWidth, height: cardHeight, borderRadius: radius }}
-            aria-roledescription="slide"
-            aria-label={`${i + 1} of ${count}`}
+            aria-roledescription={t("slide")}
+            aria-label={t('{number} of {count}', { number: i + 1, count })}
             aria-hidden={active !== i}
             onClick={() => onCardClick(i)}
           >
-            <img className="depth-carousel__img" src={item.image} alt={item.alt || ''} draggable={false} />
+            <img className="depth-carousel__img" src={item.image} alt={t(item.alt || '')} draggable={false} />
             <span
               className="depth-carousel__tint"
               ref={el => (overlayRefs.current[i] = el)}
@@ -381,7 +400,7 @@ const DepthCarousel = ({
           <button
             type="button"
             className="depth-carousel__arrow depth-carousel__arrow--prev"
-            aria-label="Previous slide"
+            aria-label={t("Previous slide")}
             onClick={() => navigateBy(-1)}
           >
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -398,7 +417,7 @@ const DepthCarousel = ({
           <button
             type="button"
             className="depth-carousel__arrow depth-carousel__arrow--next"
-            aria-label="Next slide"
+            aria-label={t("Next slide")}
             onClick={() => navigateBy(1)}
           >
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -416,14 +435,14 @@ const DepthCarousel = ({
       )}
 
       {showIndicators && count > 1 && (
-        <div className="depth-carousel__dots" role="tablist" aria-label="Slides">
+        <div className="depth-carousel__dots" role="tablist" aria-label={t("Slides")}>
           {data.map((_, i) => (
             <button
               key={i}
               type="button"
               role="tab"
               aria-selected={active === i}
-              aria-label={`Go to slide ${i + 1}`}
+              aria-label={t('Go to slide {number}', { number: i + 1 })}
               className={`depth-carousel__dot${active === i ? ' is-active' : ''}`}
               onClick={() => setFocus(i, true)}
             />

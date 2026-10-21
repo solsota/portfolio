@@ -275,6 +275,8 @@ user-select: none;
     transform: scale(0.94);
   }
 
+}
+
   /* ==================================
    PHYSICS MODE — POINTER DRAG
 ================================== */
@@ -326,5 +328,4 @@ user-select: none;
     background: var(--pill-bg);
     color: var(--pill-color);
   }
-}
 }

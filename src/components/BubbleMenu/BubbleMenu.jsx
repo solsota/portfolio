@@ -1,3 +1,4 @@
+import { useLanguage } from '../../i18n/LanguageContext'
 import { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import Matter from 'matter-js';
@@ -46,6 +47,7 @@ export default function BubbleMenu({
   logo,
   onMenuClick,
   onItemSelect,
+  onBoundsChange,
   physicsActive = false,
   gravity = 0.65,
   mouseConstraintStiffness = 0.9,
@@ -62,6 +64,8 @@ export default function BubbleMenu({
   animationDuration = 0.5,
   staggerDelay = 0.12
 }) {
+  const { t } = useLanguage()
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -86,11 +90,11 @@ export default function BubbleMenu({
 };
 
 useEffect(() => {
-  if (active) {
-    setShowOverlay(true);
-  } else if (!physicsActive) {
-    setIsMenuOpen(false);
-  }
+  const frame = requestAnimationFrame(() => {
+    if (active || physicsActive) setShowOverlay(true);
+    else setIsMenuOpen(false);
+  });
+  return () => cancelAnimationFrame(frame);
 }, [active, physicsActive]);
 
 
@@ -100,7 +104,8 @@ useEffect(() => {
     showOverlay &&
     !physicsActive
   ) {
-    setIsMenuOpen(true);
+    const frame = requestAnimationFrame(() => setIsMenuOpen(true));
+    return () => cancelAnimationFrame(frame);
   }
 }, [active, showOverlay, physicsActive]);
 
@@ -124,6 +129,7 @@ useEffect(() => {
       gsap.set(labels, { y: 24, autoAlpha: 0 });
 
       bubbles.forEach((bubble, i) => {
+        gsap.set(bubble, { rotation: menuItems[i]?.rotation ?? 0 });
         const delay = i * staggerDelay + gsap.utils.random(-0.05, 0.05);
         const tl = gsap.timeline({ delay });
 
@@ -169,7 +175,8 @@ useEffect(() => {
       animationEase,
       animationDuration,
       staggerDelay,
-      physicsActive
+      physicsActive,
+      menuItems
     ]);
 
     /* =========================
@@ -196,15 +203,19 @@ useEffect(() => {
   Body,
   Constraint,
   Query,
-  Events
+  Events,
+  Sleeping
 } = Matter;
 
+  // Finish the entrance before Matter takes ownership of the transforms.
+  gsap.killTweensOf([...bubbles, ...labelRefs.current.filter(Boolean)]);
+  gsap.set(labelRefs.current.filter(Boolean), { y: 0, autoAlpha: 1 });
 
   const overlayRect =
     overlay.getBoundingClientRect();
 
-  const width = overlayRect.width;
-  const height = overlayRect.height;
+  let width = overlayRect.width;
+  let height = overlayRect.height;
 
   if (width <= 0 || height <= 0) return;
 
@@ -226,10 +237,11 @@ useEffect(() => {
   };
 
   const wallThickness = 100;
+  const floorInset = 12;
 
 const floor = Bodies.rectangle(
   width / 2,
-  height + wallThickness / 2,
+  height - floorInset + wallThickness / 2,
   width + wallThickness * 2,
   wallThickness,
   boundaryOptions
@@ -244,7 +256,7 @@ const ceiling = Bodies.rectangle(
 );
 
 const leftWall = Bodies.rectangle(
-  -wallThickness / 2,
+  floorInset - wallThickness / 2,
   height / 2,
   wallThickness,
   height + wallThickness * 2,
@@ -252,7 +264,7 @@ const leftWall = Bodies.rectangle(
 );
 
 const rightWall = Bodies.rectangle(
-  width + wallThickness / 2,
+  width - floorInset + wallThickness / 2,
   height / 2,
   wallThickness,
   height + wallThickness * 2,
@@ -426,74 +438,22 @@ const orderedBubbleBodies =
   Solo guardamos su destino X.
 */
 
-const desiredGap = 8;
-const sidePadding = 4;
-
-
-const totalBubbleWidth =
-  orderedBubbleBodies.reduce(
-    (sum, entry) =>
-      sum + entry.width,
-    0
-  );
-
-
-const availableGapSpace =
-  width -
-  sidePadding * 2 -
-  totalBubbleWidth;
-
-
-const physicalGap =
-  orderedBubbleBodies.length > 1
-    ? Math.max(
-        0,
-        Math.min(
-          desiredGap,
-          availableGapSpace /
-            (
-              orderedBubbleBodies.length -
-              1
-            )
-        )
-      )
-    : 0;
-
-
-const rowWidth =
-  totalBubbleWidth +
-  physicalGap *
-    (
-      orderedBubbleBodies.length -
-      1
-    );
-
-
-let targetCursor =
-  (width - rowWidth) / 2;
-
-
-const targetXByBody =
-  new Map();
-
-
-orderedBubbleBodies.forEach(
-  entry => {
-
-    const targetX =
-      targetCursor +
-      entry.width / 2;
-
-    targetXByBody.set(
-      entry.body,
-      targetX
-    );
-
-    targetCursor +=
-      entry.width +
-      physicalGap;
+const targetXByBody = new Map();
+const updateTargets = () => {
+  targetXByBody.clear();
+  const columns = width < 900 ? 3 : orderedBubbleBodies.length;
+  for (let row = 0; row < Math.ceil(orderedBubbleBodies.length / columns); row++) {
+    const entries = orderedBubbleBodies.slice(row * columns, (row + 1) * columns);
+    const totalWidth = entries.reduce((sum, entry) => sum + entry.width, 0);
+    const gap = entries.length > 1 ? Math.max(0, Math.min(8, (width - 8 - totalWidth) / (entries.length - 1))) : 0;
+    let cursor = (width - totalWidth - gap * (entries.length - 1)) / 2;
+    entries.forEach(entry => {
+      targetXByBody.set(entry.body, cursor + entry.width / 2);
+      cursor += entry.width + gap;
+    });
   }
-);
+};
+updateTargets();
 
 /* =========================
    DRAG CON POINTER EVENTS
@@ -772,9 +732,9 @@ const handlePointerDown = (event) => {
   );
 
 
-  Body.setAwake(
+  Sleeping.set(
     body,
-    true
+    false
   );
 
 
@@ -842,7 +802,6 @@ const handlePointerMove = (event) => {
 
 
 const releaseActiveDrag = ({
-  event = null,
   allowClick = false,
   releaseCapture = true
 } = {}) => {
@@ -965,7 +924,6 @@ const handlePointerUp = (event) => {
 
 
   releaseActiveDrag({
-    event,
     allowClick: true,
     releaseCapture: true
   });
@@ -983,7 +941,6 @@ const handlePointerCancel = (event) => {
 
 
   releaseActiveDrag({
-    event,
     allowClick: false,
     releaseCapture: true
   });
@@ -1001,7 +958,6 @@ const handleLostPointerCapture = (event) => {
 
 
   releaseActiveDrag({
-    event,
     allowClick: false,
     releaseCapture: false
   });
@@ -1070,7 +1026,11 @@ World.add(
 
   /* MATTER → HTML */
 
+  let previousBottomInset = null;
+  let settledSince = null;
+
   const syncDOM = () => {
+    let top = height;
 
     bubbleBodies.forEach(
   ({
@@ -1079,6 +1039,9 @@ World.add(
     width: bubbleWidth,
     height: bubbleHeight
   }) => {
+    const rotatedHeight = Math.abs(Math.cos(body.angle)) * bubbleHeight +
+      Math.abs(Math.sin(body.angle)) * bubbleWidth;
+    top = Math.min(top, body.position.y - rotatedHeight / 2);
 
     /* -------------------------
        LIMITAR VELOCIDAD
@@ -1129,6 +1092,20 @@ World.add(
     `;
   }
 );
+    const bottomInset = Math.ceil(Math.max(0, height - top));
+    // Reserve the final stack only after it settles. Updating page padding on
+    // every physics tick resizes this world, moves its floor and feeds the
+    // bounce back into the document's height (especially visible on phones).
+    const settled = !draggedBody && bubbleBodies.every(({ body }) =>
+      Math.hypot(body.velocity.x, body.velocity.y) < 0.08 && Math.abs(body.angularVelocity) < 0.002
+    );
+    if (!settled) settledSince = null;
+    else if (settledSince === null) settledSince = performance.now();
+    if (settledSince !== null && performance.now() - settledSince > 250 &&
+        (previousBottomInset === null || Math.abs(bottomInset - previousBottomInset) > 2)) {
+      previousBottomInset = bottomInset;
+      onBoundsChange?.(bottomInset);
+    }
   };
   Events.on(
   engine,
@@ -1150,8 +1127,56 @@ World.add(
     engine
   );
 
+  // Follow changes in content height and viewport width without restarting physics.
+  const resizeWorld = () => {
+    const bounds = overlay.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) return;
+    if (Math.abs(bounds.width - width) < 0.5 && Math.abs(bounds.height - height) < 0.5) return;
+    const oldWidth = width;
+    const oldHeight = height;
+    width = bounds.width;
+    height = bounds.height;
+    Body.scale(floor, (width + wallThickness * 2) / (oldWidth + wallThickness * 2), 1);
+    Body.scale(ceiling, (width + wallThickness * 2) / (oldWidth + wallThickness * 2), 1);
+    Body.scale(leftWall, 1, (height + wallThickness * 2) / (oldHeight + wallThickness * 2));
+    Body.scale(rightWall, 1, (height + wallThickness * 2) / (oldHeight + wallThickness * 2));
+    Body.setPosition(floor, { x: width / 2, y: height - floorInset + wallThickness / 2 });
+    Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 });
+    Body.setPosition(leftWall, { x: floorInset - wallThickness / 2, y: height / 2 });
+    Body.setPosition(rightWall, { x: width - floorInset + wallThickness / 2, y: height / 2 });
+    bubbleBodies.forEach(entry => {
+      entry.bubble.style.width = '';
+      entry.bubble.style.height = '';
+      const newWidth = entry.bubble.offsetWidth;
+      const newHeight = entry.bubble.offsetHeight;
+      if (newWidth > 0 && newHeight > 0) {
+        // Rebuild the rounded outline: nonuniform scaling stretches its corners
+        // and lets the visual pill pass through the floor after a resize.
+        const outline = Bodies.rectangle(0, 0, newWidth, newHeight, {
+          angle: entry.body.angle,
+          chamfer: { radius: Math.min(newWidth, newHeight) / 2 }
+        });
+        Body.setVertices(entry.body, outline.vertices);
+        entry.width = newWidth;
+        entry.height = newHeight;
+      }
+      entry.bubble.style.width = `${entry.width}px`;
+      entry.bubble.style.height = `${entry.height}px`;
+      Body.setPosition(entry.body, {
+        x: clamp(entry.body.position.x * width / oldWidth, entry.width / 2, width - entry.width / 2),
+        y: Math.max(entry.height / 2, entry.body.position.y + height - oldHeight)
+      });
+    });
+    updateTargets();
+    syncDOM();
+  };
+  const worldResizeObserver = new ResizeObserver(resizeWorld);
+  worldResizeObserver.observe(overlay);
+
 
 return () => {
+  worldResizeObserver.disconnect();
+  onBoundsChange?.(null);
 
   Events.off(
   engine,
@@ -1233,10 +1258,13 @@ Events.off(
 
 }, [
   physicsActive,
+  showOverlay,
   gravity,
   mouseConstraintStiffness,
   menuItems,
-  fallenOrder
+  fallenOrder,
+  onItemSelect,
+  onBoundsChange
 ]);
 
   useEffect(() => {
@@ -1246,12 +1274,10 @@ Events.off(
     const handleResize = () => {
       if (isMenuOpen) {
         const bubbles = bubblesRef.current.filter(Boolean);
-        const isDesktop = window.innerWidth >= 900;
-
         bubbles.forEach((bubble, i) => {
           const item = menuItems[i];
           if (bubble && item) {
-            const rotation = isDesktop ? (item.rotation ?? 0) : 0;
+            const rotation = item.rotation ?? 0;
             gsap.set(bubble, { rotation });
           }
         });
@@ -1277,10 +1303,10 @@ return () =>
 
   return (
     <>
-      <nav className={containerClassName} style={style} aria-label="Main navigation">
-        <div className="bubble logo-bubble" aria-label="Logo" style={{ background: menuBg }}>
+      <nav className={containerClassName} style={style} aria-label={t("Main navigation")}>
+        <div className="bubble logo-bubble" aria-label={t("Logo")} style={{ background: menuBg }}>
           <span className="logo-content">
-            {typeof logo === 'string' ? <img src={logo} alt="Logo" className="bubble-logo" /> : logo}
+            {typeof logo === 'string' ? <img src={logo} alt={t("Logo")} className="bubble-logo" /> : logo}
           </span>
         </div>
 
@@ -1288,7 +1314,7 @@ return () =>
           type="button"
           className={`bubble toggle-bubble menu-btn ${isMenuOpen ? 'open' : ''}`}
           onClick={handleToggle}
-          aria-label={menuAriaLabel}
+          aria-label={t(menuAriaLabel)}
           aria-pressed={isMenuOpen}
           style={{ background: menuBg }}
         >
@@ -1304,18 +1330,20 @@ return () =>
             ${useFixedPosition ? 'fixed' : 'absolute'}
             ${physicsActive ? 'physics-active' : ''}
           `}
-          aria-hidden={!isMenuOpen}
+          aria-hidden={!isMenuOpen && !physicsActive}
         >
-          <ul className="pill-list" role="menu" aria-label="Menu links">
+          <ul className="pill-list" role="menu" aria-label={t("Menu links")}>
             {menuItems.map((item, idx) => (
               <li key={idx} role="none" className="pill-col">
                <button
                 type="button"
                 role="menuitem"
-                aria-label={item.ariaLabel || item.label}
+                aria-label={t(item.ariaLabel || item.label)}
                 className="pill-link"
-                onClick={() => {
-                  if (!physicsActive) {
+                onClick={(event) => {
+                  // Pointer clicks in physics mode are handled on release;
+                  // keyboard activation still uses the button's native click.
+                  if (!physicsActive || event.detail === 0) {
                     onItemSelect?.(item);
                   }
                 }}
@@ -1336,7 +1364,7 @@ return () =>
                       if (el) labelRefs.current[idx] = el;
                     }}
                   >
-                    {item.label}
+                    {t(item.label)}
                   </span>
                 </button>
               </li>

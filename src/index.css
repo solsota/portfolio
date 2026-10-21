@@ -1,16 +1,112 @@
 @import url('https://fonts.googleapis.com/css2?family=Antic+Didone&family=Italianno&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
+  color-scheme: light;
+  --cream: #f3eee8;
+  --cream-hover: #ebe3de;
   --background: #f5f2ec;
   --text: #514747;
   --muted: #69605d;
   --burgundy: #702a32;
   --deep-burgundy: #321316;
   --border: rgba(25, 24, 23, 0.16);
+  --page-surface: #f3eee8;
+  --surface: #f3eee8;
+  --image-surface: #ffffff;
+  --header-surface: #ffffff;
+  --nav-surface: #ebe8e4;
+  --nav-text: #191817;
+  --popover-surface: #f8f5f0;
+  --hover-surface: #ebe3de;
+  --section-surface: #c4ccbc;
+  --section-text: #4a171b;
+  --primary-text: #191817;
+  --secondary-text: #5c5250;
+  --accent-solid: #702a32;
+  --on-accent: #f3eee8;
+  --button-surface: var(--surface);
+  --button-text: var(--deep-burgundy);
+  --toolbar-surface: #eee9e3;
+  --page-surface-rgb: 243, 238, 232;
+  --surface-rgb: 243, 238, 232;
+  --section-text-rgb: 74, 23, 27;
+  --accent-rgb: 112, 42, 50;
+  --shadow-rgb: 50, 19, 22;
+  --toolbar-fade-rgb: 235, 231, 226;
 
   --font-didone: 'Antic Didone', serif;
   --font-script: 'Italianno', cursive;
   --font-sans: 'Poppins', sans-serif;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #3b0c21;
+  --text: #e5dad4;
+  --muted: #b9ada9;
+  --burgundy: #e8a1ad;
+  --deep-burgundy: #f4e8e3;
+  --border: rgba(238, 228, 220, 0.18);
+  --page-surface: #3b0c21;
+  --surface: #4b1b30;
+  --image-surface: #4b1b30;
+  --header-surface: #3b0c21;
+  --nav-surface: var(--cream);
+  --nav-text: #3b0c21;
+  --popover-surface: #4b1b30;
+  --hover-surface: #5c2c43;
+  --section-surface: #3b0c21;
+  --section-text: #eee4dc;
+  --primary-text: #eee4dc;
+  --secondary-text: #d0c3bd;
+  --accent-solid: var(--cream);
+  --on-accent: #3b0c21;
+  --button-surface: var(--cream);
+  --button-text: #3b0c21;
+  --button-hover-surface: var(--cream-hover);
+  --button-hover-text: #3b0c21;
+  --toolbar-surface: #4b1b30;
+  --page-surface-rgb: 59, 12, 33;
+  --surface-rgb: 75, 27, 48;
+  --section-text-rgb: 238, 228, 220;
+  --accent-rgb: 232, 161, 173;
+  --shadow-rgb: 0, 0, 0;
+  --toolbar-fade-rgb: 75, 27, 48;
+}
+
+:root[data-theme='dark'] :is(
+  .about-cv-button,
+  .experience-action-link,
+  .education-certificate,
+  .experience-card-header,
+  .skills-card-header,
+  .depth-carousel__arrow
+) {
+  background: var(--button-surface);
+  border-color: var(--button-surface);
+  color: var(--button-text);
+}
+
+:root[data-theme='dark'] :is(
+  .about-cv-button,
+  .experience-action-link,
+  .education-certificate,
+  .experience-card-header,
+  .skills-card-header,
+  .depth-carousel__arrow
+):hover {
+  background: var(--button-hover-surface);
+  border-color: var(--button-hover-surface);
+}
+
+:root[data-theme='dark'] :is(
+  .experience-card-heading h3,
+  .experience-role,
+  .experience-meta,
+  .experience-chevron,
+  .skills-card-arrow
+) {
+  color: var(--button-text);
 }
 
 *,
@@ -21,6 +117,12 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 body {

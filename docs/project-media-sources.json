@@ -1,0 +1,120 @@
+{
+  "capturedAt": "2026-10-21T15:02:37.365Z",
+  "notes": "Screenshots and original published images, converted to lossless WebP at their original dimensions. Project claims come from the supplied content brief.",
+  "assets": [
+    {
+      "file": "/projects/laereo/home.webp",
+      "source": "https://www.laereo.com/?lang=es",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "/projects/laereo/services.webp",
+      "source": "https://www.laereo.com/?page=mantenimiento&lang=es",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "/projects/laereo/about.webp",
+      "source": "https://www.laereo.com/?page=quienes-somos&lang=es",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "/projects/salty-muffin/screen-1.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvNDUxNzU4NC8yNjkzNzk4OC5wbmc=/original/tXX6fq.png",
+      "width": 1216,
+      "height": 606
+    },
+    {
+      "file": "/projects/salty-muffin/screen-2.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvNDUxNzU4NC8yNjkzNzk4OS5wbmc=/original/mvT0q7.png",
+      "width": 1360,
+      "height": 612
+    },
+    {
+      "file": "/projects/salty-muffin/screen-3.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvNDUxNzU4NC8yNjkzNzk5MS5wbmc=/original/R8UpHF.png",
+      "width": 1360,
+      "height": 616
+    },
+    {
+      "file": "/projects/salty-muffin/screen-4.webp",
+      "source": "https://img.itch.zone/aW1hZ2UvNDUxNzU4NC8yNjkzNzk5MC5wbmc=/original/eHii%2BI.png",
+      "width": 988,
+      "height": 616
+    },
+    {
+      "file": "/projects/greta/screen-1.webp",
+      "source": "https://img.itch.zone/aW1nLzIzOTc1MjUwLnBuZw==/original/xQZHeq.png",
+      "width": 2761,
+      "height": 1600
+    },
+    {
+      "file": "/projects/technical-art/environment.mp4",
+      "source": "User-supplied Masetti_Sol_TechnicalArt.mov",
+      "conversion": "H.264 High 5.1, CRF 16, yuv420p, 2560×1440 at 60 fps, MP4 faststart; AAC audio stream copied unchanged. Original HEVC MP4 archived unchanged.",
+      "width": 2560,
+      "height": 1440,
+      "fps": 60,
+      "duration": 62.717098,
+      "originalVideoPacketSHA256": "ac72c40f38558547cd31bc79a8b324164c4ccf579d9905f608e48e264ac6fd88",
+      "stream": "/projects/technical-art/stream/index.m3u8",
+      "streamConversion": "Native HLS VOD in independent MPEG-TS segments, stream-copy from compatible MP4 without an additional encode."
+    },
+    {
+      "file": "/projects/technical-art/poster.webp",
+      "source": "Frame at 00:15 of user-supplied Technical Art film",
+      "width": 2560,
+      "height": 1440,
+      "conversion": "Lossless WebP at original resolution"
+    },
+    {
+      "file": "/projects/3d-art/high-poly.webp",
+      "source": "User-supplied Arte 3d medidor.png",
+      "width": 3024,
+      "height": 1616,
+      "conversion": "Lossless WebP; original dimensions and decoded pixels verified"
+    },
+    {
+      "file": "/projects/3d-art/retopology.webp",
+      "source": "User-supplied arte 3d medidor captura 2.png",
+      "width": 3024,
+      "height": 1606,
+      "conversion": "Lossless WebP; original dimensions and decoded pixels verified"
+    },
+    {
+      "file": "/projects/adimensional/model-and-lamp.webp",
+      "source": "User-supplied WhatsApp Image 2026-10-21 at 12.51.03.jpeg",
+      "conversion": "Lossless WebP; original dimensions and decoded pixels verified",
+      "width": 1600,
+      "height": 900
+    },
+    {
+      "file": "/projects/eut/sombra.webp",
+      "source": "User-supplied sombra.png",
+      "conversion": "Lossless WebP; original dimensions and decoded pixels verified",
+      "width": 923,
+      "height": 453
+    },
+    {
+      "file": "/projects/eut/interface.webp",
+      "source": "First frame of original main-menu animation",
+      "conversion": "Static lossless WebP at original resolution"
+    },
+    {
+      "file": "/projects/technical-art/landscape.webp",
+      "source": "Frame at 00:02 of original Technical Art film",
+      "conversion": "Lossless WebP at original resolution",
+      "width": 2560,
+      "height": 1440
+    },
+    {
+      "file": "/projects/salty-muffin/main-menu.webp",
+      "source": "https://solsota.itch.io/salty-y-muffin",
+      "conversion": "Screenshot of the game canvas, converted to lossless WebP at native canvas dimensions",
+      "width": 960,
+      "height": 600
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+.adim-page { padding-top: 105px; background: var(--header-surface); color: var(--section-text); overflow-anchor: none; }
+.adim-page :is(a, button):focus-visible { outline: 2px solid var(--burgundy); outline-offset: 5px; }
+.adim-page :is(h1, h2, h3, h4, p) { margin-top: 0; }
+.adim-page h2 { margin-bottom: 20px; font-size: clamp(2rem, 3vw, 3rem); line-height: 1.12; font-weight: 700; letter-spacing: -0.045em; }
+.adim-page h3 { font-size: 1rem; line-height: 1.4; font-weight: 600; }
+.adim-page p { font-size: 0.95rem; line-height: 1.65; }
+.adim-eyebrow { margin-bottom: 18px; font-size: 0.67rem !important; font-weight: 600; letter-spacing: 0.1em; }
+.adim-hero { position: relative; min-height: clamp(340px, 35.1vw, 560px); display: flex; align-items: center; isolation: isolate; color: #3b0c21; }
+.adim-hero::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(243,238,232,.76), rgba(243,238,232,.08) 64%, transparent); }
+.adim-hero-image { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.adim-hero-content { width: min(610px, 46%); padding: 38px 0 42px 5vw; }
+.adim-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 30px; font-size: 0.75rem; font-weight: 500; }
+.adim-hero-content .adim-eyebrow { margin-bottom: 12px; }
+.adim-hero h1 { margin-bottom: 20px; font-size: clamp(2.6rem, 4.5vw, 5rem); line-height: 1.02; font-weight: 700; letter-spacing: -0.055em; }
+.adim-hero h1:focus { outline: none; }
+.adim-hero-content > p:last-child { max-width: 330px; margin-bottom: 0; font-size: 0.8rem; }
+.adim-ribbon { overflow: hidden; padding: 9px 0; background: #e98fa1; color: #3b0c21; }
+.adim-ribbon > div { display: flex; width: max-content; animation: adim-ribbon-travel 45s linear infinite; }
+.adim-ribbon span { flex-shrink: 0; white-space: nowrap; font-size: 0.73rem; font-weight: 600; }
+.adim-ribbon-star { margin: 0 24px; }
+.adim-brand-intro { display: flex; align-items: center; justify-content: space-between; gap: 60px; padding: 38px 5vw; background: var(--page-surface); border-bottom: 1px solid var(--border); }
+.adim-brand-intro > img { width: clamp(140px, 18vw, 220px); height: auto; }
+.adim-brand-intro > p { max-width: 740px; margin: 0; color: var(--secondary-text); }
+.adim-digital-section { display: grid; grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr); align-items: center; gap: 4vw; max-width: 1480px; margin: 0 auto; padding: 65px 5vw 55px; scroll-margin-top: 24px; }
+.adim-slide-copy { position: relative; min-width: 0; }
+.adim-slide-copy p:not(.adim-eyebrow, .adim-slide-detail) { margin-bottom: 14px; color: var(--secondary-text); }
+.adim-slide-copy > div:first-of-type { min-height: 420px; }
+.adim-slide-detail { padding-top: 18px; color: var(--muted); font-size: .7rem !important; }
+.adim-carousel-controls { display: flex; align-items: center; gap: 22px; margin-top: 20px; }
+.adim-carousel-controls button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--cream); color: #3b0c21; cursor: pointer; transition: color .18s, background .18s; }
+.adim-carousel-controls button:hover { background: #702a32; color: var(--cream); }
+.adim-slide-counter { font-size: .8rem; font-variant-numeric: tabular-nums; }
+.adim-slide-counter > span { margin-left: 5px; color: var(--muted); }
+.adim-carousel-column { min-width: 0; }
+.adim-carousel-viewport { display: flex; align-items: center; justify-content: center; height: 480px; overflow: hidden; }
+.adim-flex-carousel { flex-shrink: 0; width: 100%; height: 430px; transform: rotate(-9deg); transform-origin: center; }
+.adim-carousel-thumbnails { display: flex; justify-content: center; gap: 12px; padding-top: 16px; }
+.adim-carousel-thumbnails button { display: flex; align-items: center; justify-content: center; gap: 3px; width: 88px; height: 48px; padding: 3px; border: 1px solid transparent; border-radius: 7px; background: var(--page-surface); cursor: pointer; opacity: .55; transition: opacity .18s, border-color .18s; }
+.adim-carousel-thumbnails button[aria-pressed='true'], .adim-carousel-thumbnails button:hover { opacity: 1; border-color: var(--burgundy); }
+.adim-carousel-thumbnails img { width: auto; max-width: 75%; height: 100%; object-fit: contain; border-radius: 3px; }
+.adim-carousel-hint { margin: 14px 0 0; color: var(--muted); text-align: center; font-size: .68rem !important; }
+.adim-ticket-section { padding: 58px 5vw 40px; overflow: hidden; background: var(--page-surface); border-block: 1px solid var(--border); }
+.adim-ticket-heading { text-align: center; }
+.adim-ticket-heading h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+.adim-ticket-heading > p:last-child { color: var(--secondary-text); font-size: .85rem; }
+.adim-ticket-wrap { max-width: 760px; margin: 54px auto 38px; }
+.adim-ticket { margin: 0 auto; filter: drop-shadow(0 12px 18px rgba(var(--shadow-rgb), .1)); }
+.adim-ticket .tear-ticket__art { top: 42px; height: calc(var(--tt-body-h) * .55); }
+.adim-ticket .tear-ticket__image { object-position: 76% center; }
+.adim-ticket-topline, .adim-ticket-bottomline { position: absolute; left: 18px; right: 20px; display: flex; justify-content: space-between; gap: 12px; font-size: 9px; }
+.adim-ticket-topline { top: 17px; }
+.adim-ticket-topline > span, .adim-ticket-bottomline { color: #77645f; }
+.adim-ticket-bottomline { bottom: 17px; font-size: 8px; letter-spacing: .04em; }
+.adim-ticket-caption { position: absolute; left: 18px; right: 20px; bottom: 42px; }
+.adim-ticket-caption h3 { margin: 0 0 6px; font-size: 21px; letter-spacing: -.04em; }
+.adim-ticket-caption p { margin: 0; font-size: 12px; color: #77645f; }
+.adim-ticket-stub { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 18px 16px; text-align: center; }
+.adim-ticket-stub > span { color: #77645f; font-size: 9px; letter-spacing: .04em; }
+.adim-ticket-stub > div { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.adim-ticket-stub svg { color: #d85980; }
+.adim-ticket-stub strong { font-size: 11px; font-weight: 500; }
+.adim-ticket .tear-ticket__piece--stub:focus-visible { outline: 2px dashed #702a32; outline-offset: 8px; }
+.adim-ticket-result { min-height: 44px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 22px; font-size: .75rem; color: var(--muted); text-align: center; }
+.adim-ticket-result a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--section-text); }
+.adim-ticket-reset { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: var(--cream); color: #3b0c21; cursor: pointer; }
+.adim-process-section { max-width: 1280px; margin: 0 auto; padding: 76px 5vw 48px; scroll-margin-top: 24px; }
+.adim-process-copy { max-width: 950px; margin-left: auto; text-align: right; }
+.adim-process-copy > p:not(.adim-eyebrow) { margin-bottom: 10px; color: var(--secondary-text); }
+.adim-process-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 44px auto; padding: 28px 24px; background: var(--page-surface); }
+.adim-process-stats > div { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.adim-process-stats strong { margin-top: 10px; font-size: 1.5rem; font-weight: 600; }
+.adim-process-stats h4 { margin: 8px 0; font-size: .65rem; font-weight: 600; }
+.adim-process-stats p { max-width: 200px; margin-bottom: 0; font-size: .74rem; color: var(--muted); }
+.adim-product-masonry { columns: 4; column-gap: 18px; }
+.adim-product-card { position: relative; display: block; width: 100%; margin: 0 0 18px; padding: 0; break-inside: avoid; border: 0; border-radius: 4px; background: transparent; color: var(--cream); cursor: pointer; perspective: 1400px; -webkit-tap-highlight-color: transparent; }
+.adim-product-card-inner { position: absolute; inset: 0; display: block; transform-style: preserve-3d; transition: transform .65s cubic-bezier(.22,.61,.36,1); }
+.adim-product-card.is-flipped .adim-product-card-inner { transform: rotateY(180deg); }
+.adim-product-face { position: absolute; inset: 0; overflow: hidden; border-radius: 4px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.adim-product-face img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.adim-product-render { transform: rotateY(180deg); background: #787878; }
+.adim-product-flip-icon { position: absolute; right: 10px; bottom: 10px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(30,20,20,.5); pointer-events: none; }
+.adim-product-gallery-hint { margin: 4px 0 0; text-align: center; color: var(--muted); font-size: .72rem !important; }
+.adim-page-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin: 0 5vw; padding: 24px 0 44px; border-top: 1px solid var(--border); }
+.adim-page-bottom > a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: .8rem; }
+.adim-page-bottom > a:hover { color: var(--burgundy); }
+@keyframes adim-ribbon-travel { to { transform: translateX(-50%); } }
+@media (max-width: 900px) {
+  .adim-product-masonry { columns: 3; }
+  .adim-digital-section { grid-template-columns: 1fr; gap: 12px; padding-top: 44px; }
+  .adim-slide-copy > div:first-of-type { min-height: 0; }
+  .adim-carousel-viewport { height: 420px; }
+  .adim-flex-carousel { height: 380px; }
+  .adim-hero-content { width: 55%; }
+  .adim-brand-intro { gap: 28px; }
+}
+@media (max-width: 560px) {
+  .adim-product-masonry { columns: 2; column-gap: 12px; }
+  .adim-product-card { margin-bottom: 12px; }
+  .adim-product-flip-icon { right: 7px; bottom: 7px; width: 26px; height: 26px; }
+  .adim-page { padding-top: 85px; }
+  .adim-hero { min-height: 410px; align-items: flex-start; }
+  .adim-hero-image { object-position: 67% center; }
+  .adim-hero::after { background: linear-gradient(180deg, rgba(243,238,232,.92), rgba(243,238,232,.25) 72%, transparent); }
+  .adim-hero-content { width: 100%; padding: 16px 24px 28px; }
+  .adim-back { margin-bottom: 16px; }
+  .adim-hero h1 { max-width: 300px; font-size: 2.8rem; }
+  .adim-hero-content > p:last-child { max-width: 260px; }
+  .adim-brand-intro { align-items: flex-start; flex-direction: column; padding: 28px 24px; gap: 22px; }
+  .adim-brand-intro > img { width: 150px; }
+  .adim-page p { font-size: .85rem; }
+  .adim-digital-section { padding: 40px 24px; }
+  .adim-slide-copy > div:first-of-type { min-height: 0; }
+  .adim-page h2 { font-size: 1.9rem; }
+  .adim-carousel-viewport { height: 310px; }
+  .adim-flex-carousel { height: 280px; }
+  .adim-ticket-section { padding: 34px 24px 26px; }
+  .adim-ticket-wrap { margin: 34px auto 24px; }
+  .adim-process-section { padding: 44px 24px 30px; }
+  .adim-process-copy { text-align: left; }
+  .adim-process-stats { gap: 16px; padding: 22px 12px; margin-block: 28px; }
+  .adim-process-stats p { font-size: .65rem; }
+  .adim-process-stats h4 { font-size: .55rem; }
+  .adim-page-bottom { margin: 0 24px; padding-bottom: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { .adim-ribbon > div { animation: none; } .adim-product-card-inner { transition: none; } }

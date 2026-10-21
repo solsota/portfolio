@@ -1,8 +1,11 @@
-import React, { useRef } from 'react'
+import { useLanguage } from '../../i18n/LanguageContext'
+import { useRef } from 'react'
 import { useInView } from 'motion/react'
 import './ProjectMarqueeGallery.css'
 
 function MarqueeRow({ items, direction = 'left', speed = 'slow' }) {
+  const { t } = useLanguage()
+
   const duplicatedItems = [...items, ...items]
 
   return (
@@ -14,7 +17,7 @@ function MarqueeRow({ items, direction = 'left', speed = 'slow' }) {
             href={item.link}
             className="marquee-card"
           >
-            <img src={item.thumbnail} alt={item.title} />
+            <img src={item.thumbnail} alt={t(item.title)} />
           </a>
         ))}
       </div>

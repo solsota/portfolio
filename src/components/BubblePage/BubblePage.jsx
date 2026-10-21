@@ -1,7 +1,9 @@
+import { useLanguage } from '../../i18n/LanguageContext'
 import {
   useRef,
   useState,
-  useEffect
+  useEffect,
+  useCallback
 } from 'react'
 
 import {
@@ -13,9 +15,14 @@ import AboutProfileVisual from '../AboutProfileVisual/AboutProfileVisual.jsx'
 import BubbleMenu from '../BubbleMenu/BubbleMenu.jsx'
 import ToolkitSection from '../ToolkitSection/ToolkitSection.jsx'
 import DepthCarousel from '../DepthCarousel/DepthCarousel.jsx'
+import ContactContent from '../ContactContent/ContactContent.jsx'
 import './BubblePage.css'
 
 import { ChevronDown } from 'lucide-react'
+import { navigate, subscribeLocation, withoutLanguagePrefix } from '../../routing/location'
+import { workProjects } from '../../data/workProjects'
+
+const ultimoTurnoPath = workProjects.find((project) => project.id === 'work-el-ultimo-turno').path
 
 
 
@@ -108,6 +115,8 @@ const sectionContent = {
   }
 }
 
+const fallenBubbleOrder = ['about', 'education', 'skills', 'contact', 'experience']
+
 const aboutContainer = {
   hidden: {},
 
@@ -161,6 +170,8 @@ const aboutItemAnimation = {
 
 
 function AboutContent() {
+  const { t, href } = useLanguage()
+
   return (
     <motion.div
       className="about-content"
@@ -179,56 +190,39 @@ function AboutContent() {
       <motion.span
         className="about-eyebrow"
         variants={aboutItemAnimation}
-      >
-        03 — ABOUT
-      </motion.span>
+      >{t("03 — ABOUT")}</motion.span>
 
 
       <motion.h2
         className="about-title"
         variants={aboutTitleAnimation}
-      >
-        About me
-      </motion.h2>
+      >{t("About me")}</motion.h2>
 
 
       <div className="about-copy">
 
-        <motion.p variants={aboutItemAnimation}>
-          I grew up surrounded by the internet, visual culture and digital
-          tools, so learning, exploring and experimenting with new things
-          has always come naturally to me.{' '}
-          <strong>
-            I’m highly visual, detail-oriented, and I tend to get fully
-            invested in everything I create.
-          </strong>
+        <motion.p variants={aboutItemAnimation}>{t("I grew up surrounded by the internet, visual culture and digital tools, so learning, exploring and experimenting with new things has always come naturally to me.")}{' '}
+          <strong>{t("I’m highly visual, detail-oriented, and I tend to get fully invested in everything I create.")}</strong>
         </motion.p>
 
 
-        <motion.p variants={aboutItemAnimation}>
-          Research, experimentation and iteration shape my process.
-          I’m drawn to strong visual decisions, but always through the
-          lens of <strong>usability and experience.</strong>
+        <motion.p variants={aboutItemAnimation}>{t("Research, experimentation and iteration shape my process. I’m drawn to strong visual decisions, but always through the lens of ")}<strong>{t("usability and experience.")}</strong>
         </motion.p>
 
 
-        <motion.p variants={aboutItemAnimation}>
-          I tend to take <strong>ownership early</strong>, bring structure
-          to ideas and find the most effective way to turn them into
-          something tangible.
-        </motion.p>
+        <motion.p variants={aboutItemAnimation}>{t("I tend to take ")}<strong>{t("ownership early")}</strong>{t(", bring structure to ideas and find the most effective way to turn them into something tangible.")}</motion.p>
 
       </div>
 
 
-      <motion.button
-        type="button"
+      <motion.a
+        href={href('/#resume')}
         className="about-cv-button"
         variants={aboutItemAnimation}
       >
-        <span>VIEW RESUME / CV</span>
+        <span>{t("VIEW RESUME / CV")}</span>
         <span className="about-cv-arrow">→</span>
-      </motion.button>
+      </motion.a>
 
     </motion.div>
   )
@@ -278,6 +272,8 @@ const educationCardAnimation = {
 }
 
 function EducationContent() {
+  const { t } = useLanguage()
+
   return (
     <motion.div
       className="education-panels"
@@ -310,60 +306,42 @@ function EducationContent() {
         <div className="education-card-scroll">
 
           <section className="education-entry">
-            <div className="education-entry-heading">
-              CURRENTLY PURSUING
-            </div>
+            <div className="education-entry-heading">{t("CURRENTLY PURSUING")}</div>
 
-            <h3>
-              University Technician in Video Game Development & Production
-            </h3>
+            <h3>{t("University Technician in Video Game Development & Production")}</h3>
 
-            <p className="education-institution">
-              Universidad Tecnológica Nacional — E-learning
-            </p>
+            <p className="education-institution">{t("Universidad Tecnológica Nacional — E-learning")}</p>
 
             <div className="education-tags">
-              <span>Game Design</span>
-              <span>Production</span>
-              <span>Interactive Media</span>
+              <span>{t("Game Design")}</span>
+              <span>{t("Production")}</span>
+              <span>{t("Interactive Media")}</span>
             </div>
           </section>
 
           <section className="education-entry">
-            <div className="education-entry-heading">
-              GRADUATED
-            </div>
+            <div className="education-entry-heading">{t("GRADUATED")}</div>
 
-            <h3>
-              University Technician in Business Administration
-            </h3>
+            <h3>{t("University Technician in Business Administration")}</h3>
 
-            <p className="education-institution">
-              Universidad Tecnológica Nacional — E-learning
-            </p>
+            <p className="education-institution">{t("Universidad Tecnológica Nacional — E-learning")}</p>
 
             <div className="education-tags">
-              <span>Management</span>
-              <span>Organization</span>
-              <span>Team Coordination</span>
+              <span>{t("Management")}</span>
+              <span>{t("Organization")}</span>
+              <span>{t("Team Coordination")}</span>
             </div>
           </section>
 
           <section className="education-entry">
-            <div className="education-entry-heading">
-              ADDITIONAL STUDIES
-            </div>
+            <div className="education-entry-heading">{t("ADDITIONAL STUDIES")}</div>
 
-            <h3>
-              Industrial Engineering Studies
-            </h3>
+            <h3>{t("Industrial Engineering Studies")}</h3>
 
-            <p className="education-institution">
-              Universidad Tecnológica Nacional, FRC
-            </p>
+            <p className="education-institution">{t("Universidad Tecnológica Nacional, FRC")}</p>
 
             <div className="education-tags">
-              <span>2 years completed</span>
+              <span>{t("2 years completed")}</span>
             </div>
           </section>
 
@@ -393,49 +371,39 @@ function EducationContent() {
         >
                 <div className="education-card-scroll">
 
-          <div className="education-entry-heading">
-            LANGUAGES
-          </div>
+          <div className="education-entry-heading">{t("LANGUAGES")}</div>
 
           <section className="language-entry">
 
-            <h3>English</h3>
+            <h3>{t("English")}</h3>
 
-            <p>B2 / Upper Intermediate</p>
+            <p>{t("B2 / Upper Intermediate")}</p>
 
-            <strong>
-              EF SET · C1 Reading & Listening · 66/100
-            </strong>
+            <strong>{t("EF SET · C1 Reading & Listening · 66/100")}</strong>
 
             <a
               className="education-certificate"
               href="https://cert.efset.org/es/Bvj6Ag"
               target="_blank"
               rel="noreferrer"
-            >
-              View Certificate
-            </a>
+            >{t("View Certificate")}</a>
 
           </section>
 
           <section className="language-entry">
 
-            <h3>Italian</h3>
+            <h3>{t("Italian")}</h3>
 
-            <p>B1 — PLIDA Certified</p>
+            <p>{t("B1 — PLIDA Certified")}</p>
 
-            <strong>
-              Società Dante Alighieri · 104/120
-            </strong>
+            <strong>{t("Società Dante Alighieri · 104/120")}</strong>
 
             <a
               className="education-certificate"
               href="/certificates/plida-b1.pdf"
               target="_blank"
               rel="noreferrer"
-            >
-              View Certificate
-            </a>
+            >{t("View Certificate")}</a>
 
           </section>
 
@@ -501,6 +469,8 @@ function ExperienceAccordionItem({
   onToggle,
   children
 }) {
+  const { t } = useLanguage()
+
   return (
     <motion.article
       className={`experience-card ${isOpen ? 'is-open' : ''}`}
@@ -519,15 +489,15 @@ function ExperienceAccordionItem({
         <div className="experience-card-heading">
 
           <h3>
-            {title}
+            {t(title)}
           </h3>
 
           <p className="experience-role">
-            {role}
+            {t(role)}
           </p>
 
           <p className="experience-meta">
-            {meta}
+            {t(meta)}
           </p>
 
         </div>
@@ -652,6 +622,8 @@ const experienceCarouselItems = {
 }
 
 function ExperienceContent() {
+  const { t, href } = useLanguage()
+
 
   const [openExperience, setOpenExperience] = useState(null)
 
@@ -776,59 +748,39 @@ function ExperienceContent() {
 
           <ExperienceAccordionItem
             id="adimensional"
-            title="Adimensional 3D"
-            role="Co-Founder · Product & Creative Designer"
-            meta="2020 — Present · Córdoba, Argentina"
+            title={t("Adimensional 3D")}
+            role={t("Co-Founder · Product & Creative Designer")}
+            meta={t("2020 — Present · Córdoba, Argentina")}
             isOpen={openExperience === 'adimensional'}
             onToggle={() => toggleExperience('adimensional')}
           >
 
-            <p className="experience-lead">
-              Co-founded Adimensional 3D in 2020 and lead its creative
-              side across physical product design, brand identity,
-              e-commerce UX, visual content and customer experience.
-              I take products from trend research and early concepts
-              through 3D design, visual presentation and launch,
-              continuously iterating based on real customer behavior
-              and feedback.
-            </p>
+            <p className="experience-lead">{t("Co-founded Adimensional 3D in 2020 and lead its creative side across physical product design, brand identity, e-commerce UX, visual content and customer experience. I take products from trend research and early concepts through 3D design, visual presentation and launch, continuously iterating based on real customer behavior and feedback.")}</p>
 
 
             <div className="experience-tags">
-              <span>Product Design</span>
-              <span>Brand Identity</span>
-              <span>E-commerce UX</span>
-              <span>Content</span>
-              <span>Customer Experience</span>
+              <span>{t("Product Design")}</span>
+              <span>{t("Brand Identity")}</span>
+              <span>{t("E-commerce UX")}</span>
+              <span>{t("Content")}</span>
+              <span>{t("Customer Experience")}</span>
             </div>
 
 
             <section className="experience-detail-section">
 
-              <h4>
-                PRODUCT & DESIGN
-              </h4>
+              <h4>{t("PRODUCT & DESIGN")}</h4>
 
-              <p>
-                Researching trends and references, defining new product
-                opportunities and developing original products from concept
-                and sketch to 3D model, primarily using Blender.
-              </p>
+              <p>{t("Researching trends and references, defining new product opportunities and developing original products from concept and sketch to 3D model, primarily using Blender.")}</p>
 
             </section>
 
 
             <section className="experience-detail-section">
 
-              <h4>
-                BRAND & DIGITAL EXPERIENCE
-              </h4>
+              <h4>{t("BRAND & DIGITAL EXPERIENCE")}</h4>
 
-              <p>
-                Designed and evolved the brand identity, packaging and
-                visual system, while shaping the e-commerce UX, product
-                presentation and interface improvements alongside development.
-              </p>
+              <p>{t("Designed and evolved the brand identity, packaging and visual system, while shaping the e-commerce UX, product presentation and interface improvements alongside development.")}</p>
 
               <a
                 href="https://www.adimensional3d.com/"
@@ -836,9 +788,7 @@ function ExperienceContent() {
                 rel="noreferrer"
                 className="experience-action-link"
                 >
-                <span>
-                    View Adimensional3d.com
-                </span>
+                <span>{t("View Adimensional3d.com")}</span>
 
                 <span aria-hidden="true">
                     →
@@ -850,15 +800,9 @@ function ExperienceContent() {
 
             <section className="experience-detail-section">
 
-              <h4>
-                CONTENT & VISUAL COMMUNICATION
-              </h4>
+              <h4>{t("CONTENT & VISUAL COMMUNICATION")}</h4>
 
-              <p>
-                Responsible for product photography, renders, social media
-                content, campaigns and the visual presentation of products
-                across multiple colors and variations.
-              </p>
+              <p>{t("Responsible for product photography, renders, social media content, campaigns and the visual presentation of products across multiple colors and variations.")}</p>
 
               <a
                 href="https://www.instagram.com/adimensional_3d/"
@@ -866,9 +810,7 @@ function ExperienceContent() {
                 rel="noreferrer"
                 className="experience-action-link"
                 >
-                <span>
-                    View Instagram Profile
-                </span>
+                <span>{t("View Instagram Profile")}</span>
 
                 <span aria-hidden="true">
                     →
@@ -880,33 +822,22 @@ function ExperienceContent() {
 
             <section className="experience-detail-section">
 
-              <h4>
-                CUSTOMER EXPERIENCE
-              </h4>
+              <h4>{t("CUSTOMER EXPERIENCE")}</h4>
 
-              <p>
-                Managing customer communication since launch, including
-                sales inquiries, problem-solving, claims, B2B requests and
-                pre/post-purchase support across WhatsApp, Instagram and
-                other channels.
-              </p>
+              <p>{t("Managing customer communication since launch, including sales inquiries, problem-solving, claims, B2B requests and pre/post-purchase support across WhatsApp, Instagram and other channels.")}</p>
 
             </section>
 
 
             <section className="experience-related-work">
 
-              <h4>
-                EXPLORE RELATED WORK
-              </h4>
+              <h4>{t("EXPLORE RELATED WORK")}</h4>
 
               <a
-                href="#work-adimensional-brand"
+                href={href('/work/adimensional#digital-experience')}
                 className="experience-action-link"
               >
-                <span>
-                  Brand Identity & E-commerce UX
-                </span>
+                <span>{t("Brand Identity & E-commerce UX")}</span>
 
                 <span aria-hidden="true">
                   →
@@ -914,12 +845,10 @@ function ExperienceContent() {
               </a>
 
               <a
-                href="#work-adimensional-product"
+                href={href('/work/adimensional#layer-by-layer')}
                 className="experience-action-link"
               >
-                <span>
-                  3D & Product Design
-                </span>
+                <span>{t("3D & Product Design")}</span>
 
                 <span aria-hidden="true">
                   →
@@ -937,40 +866,31 @@ function ExperienceContent() {
 
           <ExperienceAccordionItem
             id="get-a-game"
-            title="Get a Game"
-            role="Co-Founder · UI/UX, Game Art & Production"
-            meta="2022 — 2023 · Independent Game Development Project"
+            title={t("Get a Game")}
+            role={t("Co-Founder · UI/UX, Game Art & Production")}
+            meta={t("2022 — 2023 · Independent Game Development Project")}
             isOpen={openExperience === 'get-a-game'}
             onToggle={() => toggleExperience('get-a-game')}
           >
 
-            <p className="experience-lead">
-              Co-founded a two-person indie game project focused on small
-              2D puzzle games. I worked across UI/UX, game art, visual
-              identity, testing, game design support and release assets,
-              while development was handled in Unity by my co-founder.
-            </p>
+            <p className="experience-lead">{t("Co-founded a two-person indie game project focused on small 2D puzzle games. I worked across UI/UX, game art, visual identity, testing, game design support and release assets, while development was handled in Unity by my co-founder.")}</p>
 
 
             <div className="experience-tags">
-              <span>UI/UX</span>
-              <span>Game Art</span>
-              <span>Game Design</span>
-              <span>Testing</span>
-              <span>Production</span>
-              <span>Branding</span>
+              <span>{t("UI/UX")}</span>
+              <span>{t("Game Art")}</span>
+              <span>{t("Game Design")}</span>
+              <span>{t("Testing")}</span>
+              <span>{t("Production")}</span>
+              <span>{t("Branding")}</span>
             </div>
 
 
             <div className="experience-highlight">
 
-              <strong>
-                2 Android puzzle games published
-              </strong>
+              <strong>{t("2 Android puzzle games published")}</strong>
 
-              <span>
-                Magic Tap Away · 2048
-              </span>
+              <span>{t("Magic Tap Away · 2048")}</span>
 
             </div>
 
@@ -979,9 +899,7 @@ function ExperienceContent() {
               href="#work-get-a-game"
               className="experience-action-link"
             >
-              <span>
-                View Projects
-              </span>
+              <span>{t("View Projects")}</span>
 
               <span aria-hidden="true">
                 →
@@ -997,118 +915,81 @@ function ExperienceContent() {
 
           <ExperienceAccordionItem
             id="t15-studio"
-            title="T15 Studio"
-            role="UI/UX Designer · Game & Technical Art · Production"
-            meta="2026 — Present · Game Development Team"
+            title={t("T15 Studio")}
+            role={t("UI/UX Designer · Game & Technical Art · Production")}
+            meta={t("2026 — Present · Game Development Team")}
             isOpen={openExperience === 't15-studio'}
             onToggle={() => toggleExperience('t15-studio')}
           >
 
-            <p className="experience-lead">
-              Working across UI/UX, game and technical art, Unity
-              implementation and production on El Último Turno, a narrative
-              horror game developed as a collaborative university project.
-              My work focuses on shaping the visual and interactive
-              experience through environment art, lighting, character
-              integration and animation, interface design, gameplay polish
-              and narrative iteration.
-            </p>
+            <p className="experience-lead">{t("Working across UI/UX, game and technical art, Unity implementation and production on El Último Turno, a narrative horror game developed as a collaborative university project. My work focuses on shaping the visual and interactive experience through environment art, lighting, character integration and animation, interface design, gameplay polish and narrative iteration.")}</p>
 
 
             <div className="experience-tags">
-              <span>UI/UX</span>
-              <span>Unity</span>
-              <span>Environment Art</span>
-              <span>Lighting</span>
-              <span>Animation</span>
-              <span>Production</span>
+              <span>{t("UI/UX")}</span>
+              <span>{t("Unity")}</span>
+              <span>{t("Environment Art")}</span>
+              <span>{t("Lighting")}</span>
+              <span>{t("Animation")}</span>
+              <span>{t("Production")}</span>
             </div>
 
 
             <section className="experience-detail-section">
 
-              <h4>
-                GAME & TECHNICAL ART
-              </h4>
+              <h4>{t("GAME & TECHNICAL ART")}</h4>
 
-              <p>
-                Environment dressing and lighting, 3D asset integration,
-                character setup, rigging and animation using Unity,
-                Blender and Mixamo.
-              </p>
+              <p>{t("Environment dressing and lighting, 3D asset integration, character setup, rigging and animation using Unity, Blender and Mixamo.")}</p>
 
             </section>
 
 
             <section className="experience-detail-section">
 
-              <h4>
-                UI/UX & IMPLEMENTATION
-              </h4>
+              <h4>{t("UI/UX & IMPLEMENTATION")}</h4>
 
-              <p>
-                Designed and implemented the game's complete interface
-                and interaction experience in Unity, including HUDs,
-                menus, interaction systems and visual feedback.
-              </p>
+              <p>{t("Designed and implemented the game's complete interface and interaction experience in Unity, including HUDs, menus, interaction systems and visual feedback.")}</p>
 
             </section>
 
 
             <section className="experience-detail-section">
 
-              <h4>
-                DESIGN & PRODUCTION
-              </h4>
+              <h4>{t("DESIGN & PRODUCTION")}</h4>
 
-              <p>
-                Contributed to gameplay and narrative iteration, level
-                polish, project coordination and the visual communication
-                surrounding the game.
-              </p>
+              <p>{t("Contributed to gameplay and narrative iteration, level polish, project coordination and the visual communication surrounding the game.")}</p>
 
             </section>
 
 
             <section className="experience-achievement">
 
-              <h4>
-                SELECTED BY UTN FOR EVA 2026
-              </h4>
+              <h4>{t("SELECTED BY UTN FOR EVA 2026")}</h4>
 
-              <p>
-                Currently in mentorship and development, polishing the
-                playable demo for its presentation at EVA.
-              </p>
+              <p>{t("Currently in mentorship and development, polishing the playable demo for its presentation at EVA.")}</p>
 
             </section>
 
 
             <section className="experience-related-work">
 
-              <h4>
-                RELATED WORK
-              </h4>
+              <h4>{t("RELATED WORK")}</h4>
 
 
               <div className="experience-related-item">
 
                 <a
-                  href="#work-el-ultimo-turno"
+                  href={href(ultimoTurnoPath)}
                   className="experience-action-link"
                 >
-                  <span>
-                    El Último Turno — Game Case Study
-                  </span>
+                  <span>{t("El Último Turno — Game Case Study")}</span>
 
                   <span aria-hidden="true">
                     →
                   </span>
                 </a>
 
-                <p>
-                  UI/UX · Technical Art · Game Design · Unity
-                </p>
+                <p>{t("UI/UX · Technical Art · Game Design · Unity")}</p>
 
               </div>
 
@@ -1119,18 +1000,14 @@ function ExperienceContent() {
                   href="#work-t15-branding"
                   className="experience-action-link"
                 >
-                  <span>
-                    T15 Studio — Visual Identity
-                  </span>
+                  <span>{t("T15 Studio — Visual Identity")}</span>
 
                   <span aria-hidden="true">
                     →
                   </span>
                 </a>
 
-                <p>
-                  Branding · Logo Design · Social Media · Trailer
-                </p>
+                <p>{t("Branding · Logo Design · Social Media · Trailer")}</p>
 
               </div>
 
@@ -1162,7 +1039,7 @@ const skillsData = [
       'Prototyping',
       'Usability Testing'
     ],
-    image: '/skills/uiux.webp',
+    image: '/adim/Fast PC .webp',
     alt: 'UI/UX and interaction design work'
   },
 
@@ -1180,7 +1057,7 @@ const skillsData = [
       'Debugging',
       'Git & GitHub'
     ],
-    image: '/skills/technical-ui.webp',
+    image: '/adim/Fast Mobile.webp',
     alt: 'Technical UI implementation'
   },
 
@@ -1198,7 +1075,7 @@ const skillsData = [
       'Animation Integration',
       'Basic Asset Optimization'
     ],
-    image: '/skills/technical-art.webp',
+    image: '/experience/t15-01.webp',
     alt: 'Game and technical art work'
   },
 
@@ -1216,7 +1093,7 @@ const skillsData = [
       'Asset Modification',
       'Color & Material Direction'
     ],
-    image: '/skills/product-3d.webp',
+    image: '/experience/adimensional-02.webp',
     alt: '3D and product design work'
   },
 
@@ -1234,7 +1111,7 @@ const skillsData = [
       'Product Presentation',
       'Digital Assets'
     ],
-    image: '/skills/visual-brand.webp',
+    image: '/adim/Logo Adim.webp',
     alt: 'Visual and brand design work'
   },
 
@@ -1252,12 +1129,13 @@ const skillsData = [
       'GDDs & Documentation',
       'Project Coordination'
     ],
-    image: '/skills/game-production.webp',
+    image: '/experience/t15-03.webp',
     alt: 'Game design and production work'
   }
 ]
 
 function SkillsContent() {
+  const { t } = useLanguage()
 
   const [openSkill, setOpenSkill] =
     useState(null)
@@ -1288,6 +1166,8 @@ function SkillsContent() {
   return (
     <motion.div
       className="skills-layout"
+      role="region"
+      aria-label={t("Skills and details")}
 
       initial={{
         opacity: 0,
@@ -1325,6 +1205,7 @@ function SkillsContent() {
 
             <motion.article
               key={item.id}
+              id={`skill-card-${item.id}`}
 
               className={`
                 skills-card
@@ -1343,6 +1224,7 @@ function SkillsContent() {
                 }}
 
                 aria-expanded={isActive}
+                aria-controls={`skill-panel-${item.id}`}
               >
 
                 <span className="skills-card-title">
@@ -1356,7 +1238,7 @@ function SkillsContent() {
                   </span>
 
                   <span>
-                    {item.title}
+                    {t(item.title)}
                   </span>
 
                 </span>
@@ -1387,6 +1269,7 @@ function SkillsContent() {
 
                   <motion.div
                     className="skills-card-content"
+                    id={`skill-panel-${item.id}`}
 
                     initial={{
                       height: 0,
@@ -1423,7 +1306,7 @@ function SkillsContent() {
                           key={skill}
                           className="skills-item"
                         >
-                          {skill}
+                          {t(skill)}
                         </span>
 
                       ))}
@@ -1483,7 +1366,7 @@ function SkillsContent() {
 
             <img
               src={currentSkill.image}
-              alt={currentSkill.alt}
+              alt={t(currentSkill.alt)}
               className="skills-visual-image"
             />
 
@@ -1495,7 +1378,7 @@ function SkillsContent() {
               </span>
 
               <span>
-                {currentSkill.title}
+                {t(currentSkill.title)}
               </span>
 
             </div>
@@ -1511,6 +1394,8 @@ function SkillsContent() {
 }
 
 function BubblePage() {
+  const { t, language } = useLanguage()
+
 
     const sectionRef = useRef(null)
 
@@ -1525,9 +1410,51 @@ function BubblePage() {
     const [isPagePresent, setIsPagePresent] = useState(false)
 
  const isInView = useInView(sectionRef, {
-  amount: 0.18,
+  amount: 'some',
   once: false
 })
+
+// These panels share one page, so a URL fragment must also select its content.
+// Listen to clicks as well as hash changes to support revisiting the same link.
+useEffect(() => {
+  let previousLocation = new URL(window.location.href)
+
+  const openFragment = (hash) => {
+    const section = hash.slice(1)
+
+    if (!Object.hasOwn(sectionContent, section)) return
+
+    setSelectedSection(section)
+    setPhysicsActive(true)
+    sectionRef.current?.scrollIntoView({ block: 'start' })
+  }
+
+  const onHashChange = () => {
+    const currentLocation = new URL(window.location.href)
+    const languageOnly = currentLocation.pathname !== previousLocation.pathname &&
+      withoutLanguagePrefix(currentLocation.pathname) === withoutLanguagePrefix(previousLocation.pathname) &&
+      currentLocation.search === previousLocation.search &&
+      currentLocation.hash === previousLocation.hash
+    previousLocation = currentLocation
+
+    // Translating the current view must preserve its scroll and open panels.
+    if (!languageOnly) openFragment(currentLocation.hash)
+  }
+  const onAnchorClick = (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const anchor = event.target.closest('a[href^="#"]')
+    if (anchor) openFragment(anchor.getAttribute('href'))
+  }
+
+  const initialFrame = requestAnimationFrame(onHashChange)
+  const unsubscribe = subscribeLocation(onHashChange)
+  document.addEventListener('click', onAnchorClick)
+  return () => {
+    cancelAnimationFrame(initialFrame)
+    unsubscribe()
+    document.removeEventListener('click', onAnchorClick)
+  }
+}, [])
 
 useEffect(() => {
 
@@ -1545,12 +1472,10 @@ useEffect(() => {
         haya al menos un poquito visible.
       */
 
-      setIsPagePresent(
-        entry.intersectionRatio > 0.02
-      )
+      setIsPagePresent(entry.isIntersecting)
     },
     {
-      threshold: [0, 0.02]
+      threshold: 0
     }
   )
 
@@ -1604,6 +1529,9 @@ useEffect(() => {
     return
   }
 
+  // Keep a tall section mounted when reaching the footer, so the page cannot collapse.
+  if (sectionRef.current?.getBoundingClientRect().bottom <= 0) return
+
 
   /*
     Ahora sí:
@@ -1623,46 +1551,35 @@ useEffect(() => {
 
 }, [isPagePresent])
 
-const handleBubbleSelect = (item) => {
-
-  /*
-    Cambia la sección mostrada.
-  */
-
+const handleBubbleSelect = useCallback((item) => {
   setSelectedSection(item.label)
+  setPhysicsActive(true)
+  navigate(`${window.location.pathname}${window.location.search}${item.href}`)
+}, [])
 
-
-  /*
-    Solo activamos la física
-    la PRIMERA vez que tocamos
-    una bubble.
-
-    Si ya están caídas,
-    permanecen exactamente
-    donde están.
-  */
-
-  if (!physicsActive) {
-    setPhysicsActive(true)
-  }
-}
-    const fallenBubbleOrder = [
-    'about',
-    'education',
-    'skills',
-    'contact',
-    'experience'
-    ]
+const handleNavigationBounds = useCallback((bottomInset) => {
+  const section = sectionRef.current
+  if (!section) return
+  if (bottomInset === null) section.style.removeProperty('--fallen-menu-inset')
+  else section.style.setProperty('--fallen-menu-inset', `${bottomInset}px`)
+}, [])
   return (
     <section
       ref={sectionRef}
-      className="bubble-page"
+      className={`bubble-page${selectedSection ? ' has-selection' : ''}`}
+      data-section={selectedSection || 'explore'}
       id="explore"
     >
+        {Object.keys(sectionContent).map((id) => (
+          <span key={id} id={id} className="bubble-section-anchor" aria-hidden="true" />
+        ))}
         <ToolkitSection />
+
+        <div className={`bubble-content${selectedSection ? ' is-selected' : ''}`}>
 
         {selectedSection === 'about' && (
   <AboutProfileVisual
+    key={language}
     active={selectedSection === 'about'}
   />
 )}
@@ -1701,14 +1618,14 @@ const handleBubbleSelect = (item) => {
 
       <span>
         03 — {selectedSection
-          ? selectedSection.toUpperCase()
-          : 'EXPLORE'}
+          ? t(selectedSection.toUpperCase())
+          : t('EXPLORE')}
       </span>
 
       <h2>
         {selectedSection
-          ? sectionContent[selectedSection].title
-          : 'Inside the archive'}
+          ? t(sectionContent[selectedSection].title)
+          : t('Inside the archive')}
       </h2>
 
         {selectedSection &&
@@ -1716,7 +1633,7 @@ const handleBubbleSelect = (item) => {
         selectedSection !== 'experience' &&
         selectedSection !== 'skills' && (
     <p className="bubble-section-description">
-        {sectionContent[selectedSection].text}
+        {t(sectionContent[selectedSection].text)}
     </p>
     )}
 
@@ -1758,8 +1675,16 @@ const handleBubbleSelect = (item) => {
         </AnimatePresence>
 
 
+      <AnimatePresence>
+        {selectedSection === 'contact' && <ContactContent key="contact-content" />}
+      </AnimatePresence>
+
+      </div>
+
       <BubbleMenu
         key={bubbleResetKey}
+
+        onBoundsChange={handleNavigationBounds}
 
         active={isInView}
 
@@ -1776,20 +1701,18 @@ const handleBubbleSelect = (item) => {
         mouseConstraintStiffness={0.55}
 
         logo={
-          <span className="bubble-sol-logo">
-            SOL.
-          </span>
+          <span className="bubble-sol-logo">{t("SOL.")}</span>
         }
 
         items={bubbleItems}
 
         fallenOrder={fallenBubbleOrder}
 
-        menuAriaLabel="Explore portfolio"
+        menuAriaLabel={t("Explore portfolio")}
 
-        menuBg="#f3eee8"
+        menuBg="var(--button-surface)"
 
-        menuContentColor="#321316"
+        menuContentColor="var(--button-text)"
 
         useFixedPosition={false}
 
